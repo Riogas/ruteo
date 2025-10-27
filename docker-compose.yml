@@ -1,5 +1,3 @@
-version: '3.8'
-
 # ============================================
 # Sistema de Ruteo con Geocodificación
 # ============================================
@@ -49,7 +47,7 @@ services:
       - ./config:/app/config:ro
       
     depends_on:
-      redis:
+      ruteo-redis:
         condition: service_healthy
         
     restart: unless-stopped
