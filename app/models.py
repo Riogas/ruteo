@@ -58,14 +58,20 @@ class OrderStatus(str, Enum):
 # ============================================================================
 
 class Coordinates(BaseModel):
-    """Coordenadas geográficas (latitud, longitud)"""
+    """Coordenadas geográficas (latitud, longitud) con soporte UTM"""
     lat: float = Field(..., ge=-90, le=90, description="Latitud")
     lon: float = Field(..., ge=-180, le=180, description="Longitud")
+    utm_x: Optional[float] = Field(None, description="Coordenada UTM X (Este)")
+    utm_y: Optional[float] = Field(None, description="Coordenada UTM Y (Norte)")
+    utm_zone: Optional[str] = Field(None, description="Zona UTM (ej: 21S)")
     
     model_config = ConfigDict(json_schema_extra={
         "example": {
             "lat": -34.603722,
-            "lon": -58.381592
+            "lon": -58.381592,
+            "utm_x": 366439.84,
+            "utm_y": 6170832.45,
+            "utm_zone": "21S"
         }
     })
 

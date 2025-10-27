@@ -11,6 +11,7 @@ networkx>=3.2.1
 shapely>=2.0.2
 geopandas>=0.14.1
 folium>=0.15.1
+pyproj>=3.6.1
 
 # Optimización y ML
 ortools>=9.14.0

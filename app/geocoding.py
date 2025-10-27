@@ -34,6 +34,7 @@ from shapely.geometry import LineString, Point
 from shapely.ops import unary_union
 
 from app.models import Address, Coordinates
+from app.utils import lat_lon_to_utm
 
 
 class GeocodingService:
@@ -167,6 +168,26 @@ class GeocodingService:
         
         self._last_request_time = time.time()
     
+    def _enrich_with_utm(self, coords: Coordinates) -> Coordinates:
+        """
+        Enriquece un objeto Coordinates con coordenadas UTM.
+        
+        Args:
+            coords: Coordenadas con lat/lon
+            
+        Returns:
+            Coordenadas enriquecidas con utm_x, utm_y, utm_zone
+        """
+        try:
+            utm_x, utm_y, utm_zone = lat_lon_to_utm(coords.lat, coords.lon)
+            coords.utm_x = utm_x
+            coords.utm_y = utm_y
+            coords.utm_zone = utm_zone
+            return coords
+        except Exception as e:
+            logger.warning(f"No se pudo calcular coordenadas UTM: {e}")
+            return coords
+    
     def _geocode_with_provider(
         self,
         address: str,
@@ -201,6 +222,8 @@ class GeocodingService:
                     lat=location.latitude,
                     lon=location.longitude
                 )
+                # Enriquecer con coordenadas UTM
+                coords = self._enrich_with_utm(coords)
                 logger.info(f"✓ Geocodificado con {provider_name}: {address} -> {coords}")
                 return coords
             else:
@@ -335,6 +358,7 @@ class GeocodingService:
             # Verificar que la intersección sea un punto
             if isinstance(intersection, Point):
                 coords = Coordinates(lat=intersection.y, lon=intersection.x)
+                coords = self._enrich_with_utm(coords)
                 logger.info(f"✅ Intersección EXACTA: {coords}")
                 return coords
             elif not intersection.is_empty:
@@ -343,6 +367,7 @@ class GeocodingService:
                     first_point = list(intersection.geoms)[0]
                     if isinstance(first_point, Point):
                         coords = Coordinates(lat=first_point.y, lon=first_point.x)
+                        coords = self._enrich_with_utm(coords)
                         logger.info(f"✅ Intersección EXACTA (múltiple, 1ro): {coords}")
                         return coords
             else:
@@ -392,6 +417,8 @@ class GeocodingService:
                         )
             
             if best_point:
+                # Enriquecer con coordenadas UTM
+                best_point = self._enrich_with_utm(best_point)
                 logger.info(f"✓ Intersección APROXIMADA: {street1} ∩ {street2}")
                 return best_point
                 

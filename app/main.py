@@ -48,6 +48,7 @@ from app.models import (
     Coordinates
 )
 from app.geocoding import get_geocoding_service
+from app.utils import lat_lon_to_utm
 from app.routing import RouteCalculator
 from app.scoring import ScoringEngine
 from app.optimizer import RouteOptimizer, ClusteringOptimizer
@@ -532,6 +533,16 @@ async def reverse_geocode_coordinates(coordinates: Coordinates) -> Address:
     """
     try:
         logger.info(f"🔄 Reverse geocoding: ({coordinates.lat}, {coordinates.lon})")
+        
+        # Enriquecer coordenadas con UTM si no las tiene
+        if not coordinates.utm_x or not coordinates.utm_y:
+            try:
+                utm_x, utm_y, utm_zone = lat_lon_to_utm(coordinates.lat, coordinates.lon)
+                coordinates.utm_x = utm_x
+                coordinates.utm_y = utm_y
+                coordinates.utm_zone = utm_zone
+            except Exception as e:
+                logger.warning(f"No se pudo calcular coordenadas UTM: {e}")
         
         address = geocoding_service.reverse_geocode(coordinates)
         
