@@ -1,0 +1,1162 @@
+{
+  "orders": [
+    {
+      "id": "ORD-PEND-001",
+      "customer_name": "Jorge López",
+      "customer_phone": "+598 98 736 517",
+      "delivery_address": "José Belloni 988, Montevideo",
+      "delivery_location": {
+        "lat": -34.902045,
+        "lon": -56.163883,
+        "address": "José Belloni 988, Montevideo"
+      },
+      "deadline": "2025-10-24T18:30:00",
+      "priority": "urgent",
+      "estimated_duration": 3,
+      "items": [
+        {
+          "name": "Teclado",
+          "quantity": 1,
+          "weight_kg": 0.8
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-002",
+      "customer_name": "Roberto Martínez",
+      "customer_phone": "+598 93 307 152",
+      "delivery_address": "Colón 1936, Montevideo",
+      "delivery_location": {
+        "lat": -34.906163,
+        "lon": -56.169948,
+        "address": "Colón 1936, Montevideo"
+      },
+      "deadline": "2025-10-24T16:45:00",
+      "priority": "high",
+      "estimated_duration": 6,
+      "items": [
+        {
+          "name": "Monitor 24\"",
+          "quantity": 2,
+          "weight_kg": 6.0
+        },
+        {
+          "name": "Notebook HP",
+          "quantity": 2,
+          "weight_kg": 2.5
+        },
+        {
+          "name": "Mouse",
+          "quantity": 1,
+          "weight_kg": 0.2
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-003",
+      "customer_name": "Ana Ramírez",
+      "customer_phone": "+598 91 484 449",
+      "delivery_address": "Colón 3076, Montevideo",
+      "delivery_location": {
+        "lat": -34.890015,
+        "lon": -56.154064,
+        "address": "Colón 3076, Montevideo"
+      },
+      "deadline": "2025-10-24T19:45:00",
+      "priority": "urgent",
+      "estimated_duration": 6,
+      "items": [
+        {
+          "name": "Auriculares",
+          "quantity": 1,
+          "weight_kg": 0.3
+        },
+        {
+          "name": "Tablet",
+          "quantity": 2,
+          "weight_kg": 0.5
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-004",
+      "customer_name": "Jorge Torres",
+      "customer_phone": "+598 95 425 426",
+      "delivery_address": "Colón 458, Montevideo",
+      "delivery_location": {
+        "lat": -34.893717,
+        "lon": -56.198695,
+        "address": "Colón 458, Montevideo"
+      },
+      "deadline": "2025-10-24T16:30:00",
+      "priority": "urgent",
+      "estimated_duration": 4,
+      "items": [
+        {
+          "name": "Notebook HP",
+          "quantity": 1,
+          "weight_kg": 2.5
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-005",
+      "customer_name": "Fernando Martínez",
+      "customer_phone": "+598 91 449 146",
+      "delivery_address": "Colón 330, Montevideo",
+      "delivery_location": {
+        "lat": -34.895027,
+        "lon": -56.150544,
+        "address": "Colón 330, Montevideo"
+      },
+      "deadline": "2025-10-24T19:45:00",
+      "priority": "urgent",
+      "estimated_duration": 3,
+      "items": [
+        {
+          "name": "Auriculares",
+          "quantity": 1,
+          "weight_kg": 0.3
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-006",
+      "customer_name": "Gabriel López",
+      "customer_phone": "+598 94 711 173",
+      "delivery_address": "Yaguarón 3436, Montevideo",
+      "delivery_location": {
+        "lat": -34.904897,
+        "lon": -56.190418,
+        "address": "Yaguarón 3436, Montevideo"
+      },
+      "deadline": "2025-10-24T16:45:00",
+      "priority": "high",
+      "estimated_duration": 8,
+      "items": [
+        {
+          "name": "Disco SSD",
+          "quantity": 2,
+          "weight_kg": 0.15
+        },
+        {
+          "name": "Disco SSD",
+          "quantity": 2,
+          "weight_kg": 0.15
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-007",
+      "customer_name": "Patricia Ramírez",
+      "customer_phone": "+598 95 454 310",
+      "delivery_address": "Av. Millán 2023, Montevideo",
+      "delivery_location": {
+        "lat": -34.901657,
+        "lon": -56.167177,
+        "address": "Av. Millán 2023, Montevideo"
+      },
+      "deadline": "2025-10-24T18:45:00",
+      "priority": "medium",
+      "estimated_duration": 5,
+      "items": [
+        {
+          "name": "Impresora",
+          "quantity": 1,
+          "weight_kg": 7.5
+        },
+        {
+          "name": "Auriculares",
+          "quantity": 1,
+          "weight_kg": 0.3
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-008",
+      "customer_name": "Miguel Flores",
+      "customer_phone": "+598 98 470 186",
+      "delivery_address": "Av. Italia 1412, Montevideo",
+      "delivery_location": {
+        "lat": -34.897437,
+        "lon": -56.16315,
+        "address": "Av. Italia 1412, Montevideo"
+      },
+      "deadline": "2025-10-24T17:30:00",
+      "priority": "urgent",
+      "estimated_duration": 8,
+      "items": [
+        {
+          "name": "Notebook HP",
+          "quantity": 2,
+          "weight_kg": 2.5
+        },
+        {
+          "name": "Teclado",
+          "quantity": 1,
+          "weight_kg": 0.8
+        },
+        {
+          "name": "Teclado",
+          "quantity": 2,
+          "weight_kg": 0.8
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-009",
+      "customer_name": "Miguel González",
+      "customer_phone": "+598 96 984 685",
+      "delivery_address": "San José 3731, Montevideo",
+      "delivery_location": {
+        "lat": -34.905024,
+        "lon": -56.154585,
+        "address": "San José 3731, Montevideo"
+      },
+      "deadline": "2025-10-24T16:30:00",
+      "priority": "low",
+      "estimated_duration": 6,
+      "items": [
+        {
+          "name": "Teclado",
+          "quantity": 2,
+          "weight_kg": 0.8
+        },
+        {
+          "name": "Hub USB",
+          "quantity": 1,
+          "weight_kg": 0.2
+        },
+        {
+          "name": "Notebook HP",
+          "quantity": 2,
+          "weight_kg": 2.5
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-010",
+      "customer_name": "Carmen Martínez",
+      "customer_phone": "+598 98 630 148",
+      "delivery_address": "Canelones 2987, Montevideo",
+      "delivery_location": {
+        "lat": -34.904833,
+        "lon": -56.18638,
+        "address": "Canelones 2987, Montevideo"
+      },
+      "deadline": "2025-10-24T19:15:00",
+      "priority": "high",
+      "estimated_duration": 3,
+      "items": [
+        {
+          "name": "Router WiFi",
+          "quantity": 1,
+          "weight_kg": 0.6
+        },
+        {
+          "name": "Teclado",
+          "quantity": 2,
+          "weight_kg": 0.8
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-011",
+      "customer_name": "Fernando López",
+      "customer_phone": "+598 97 981 884",
+      "delivery_address": "Colón 1075, Montevideo",
+      "delivery_location": {
+        "lat": -34.897638,
+        "lon": -56.152453,
+        "address": "Colón 1075, Montevideo"
+      },
+      "deadline": "2025-10-24T17:45:00",
+      "priority": "high",
+      "estimated_duration": 4,
+      "items": [
+        {
+          "name": "Notebook HP",
+          "quantity": 2,
+          "weight_kg": 2.5
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-012",
+      "customer_name": "María González",
+      "customer_phone": "+598 94 132 866",
+      "delivery_address": "Av. Italia 2701, Montevideo",
+      "delivery_location": {
+        "lat": -34.909874,
+        "lon": -56.166578,
+        "address": "Av. Italia 2701, Montevideo"
+      },
+      "deadline": "2025-10-24T16:45:00",
+      "priority": "medium",
+      "estimated_duration": 5,
+      "items": [
+        {
+          "name": "Disco SSD",
+          "quantity": 2,
+          "weight_kg": 0.15
+        },
+        {
+          "name": "Tablet",
+          "quantity": 2,
+          "weight_kg": 0.5
+        },
+        {
+          "name": "Mouse",
+          "quantity": 1,
+          "weight_kg": 0.2
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-013",
+      "customer_name": "Carlos Pérez",
+      "customer_phone": "+598 98 980 998",
+      "delivery_address": "Comercio 1134, Montevideo",
+      "delivery_location": {
+        "lat": -34.902874,
+        "lon": -56.186508,
+        "address": "Comercio 1134, Montevideo"
+      },
+      "deadline": "2025-10-24T16:00:00",
+      "priority": "urgent",
+      "estimated_duration": 6,
+      "items": [
+        {
+          "name": "Monitor 24\"",
+          "quantity": 2,
+          "weight_kg": 6.0
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-014",
+      "customer_name": "Isabella Ramírez",
+      "customer_phone": "+598 98 874 866",
+      "delivery_address": "Constituyente 381, Montevideo",
+      "delivery_location": {
+        "lat": -34.898467,
+        "lon": -56.169996,
+        "address": "Constituyente 381, Montevideo"
+      },
+      "deadline": "2025-10-24T19:15:00",
+      "priority": "low",
+      "estimated_duration": 5,
+      "items": [
+        {
+          "name": "Tablet",
+          "quantity": 2,
+          "weight_kg": 0.5
+        }
+      ]
+    },
+    {
+      "id": "ORD-PEND-015",
+      "customer_name": "Isabella Fernández",
+      "customer_phone": "+598 92 299 145",
+      "delivery_address": "Mercedes 1927, Montevideo",
+      "delivery_location": {
+        "lat": -34.895303,
+        "lon": -56.163189,
+        "address": "Mercedes 1927, Montevideo"
+      },
+      "deadline": "2025-10-24T18:15:00",
+      "priority": "medium",
+      "estimated_duration": 4,
+      "items": [
+        {
+          "name": "Disco SSD",
+          "quantity": 2,
+          "weight_kg": 0.15
+        },
+        {
+          "name": "Hub USB",
+          "quantity": 2,
+          "weight_kg": 0.2
+        },
+        {
+          "name": "Notebook HP",
+          "quantity": 2,
+          "weight_kg": 2.5
+        }
+      ]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "MOTO-001",
+      "driver_name": "Diego García",
+      "driver_phone": "+598 91 365 709",
+      "vehicle_type": "moto",
+      "license_plate": "SDC-3565",
+      "current_location": {
+        "lat": -34.902207,
+        "lon": -56.175153,
+        "address": "Rambla República de México 528, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-ASIG-001",
+          "customer_name": "Valentina Sánchez",
+          "customer_phone": "+598 98 170 645",
+          "delivery_address": "José Belloni 3219, Montevideo",
+          "delivery_location": {
+            "lat": -34.890617,
+            "lon": -56.185604,
+            "address": "José Belloni 3219, Montevideo"
+          },
+          "deadline": "2025-10-24T19:45:00",
+          "priority": "high",
+          "estimated_duration": 5,
+          "items": [
+            {
+              "name": "Impresora",
+              "quantity": 2,
+              "weight_kg": 7.5
+            },
+            {
+              "name": "Cable HDMI",
+              "quantity": 2,
+              "weight_kg": 0.1
+            },
+            {
+              "name": "Disco SSD",
+              "quantity": 2,
+              "weight_kg": 0.15
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T11:48:00"
+        },
+        {
+          "id": "ORD-ASIG-002",
+          "customer_name": "María Martínez",
+          "customer_phone": "+598 99 523 329",
+          "delivery_address": "Mercedes 2042, Montevideo",
+          "delivery_location": {
+            "lat": -34.903035,
+            "lon": -56.159088,
+            "address": "Mercedes 2042, Montevideo"
+          },
+          "deadline": "2025-10-24T16:15:00",
+          "priority": "medium",
+          "estimated_duration": 5,
+          "items": [
+            {
+              "name": "Notebook HP",
+              "quantity": 1,
+              "weight_kg": 2.5
+            },
+            {
+              "name": "Impresora",
+              "quantity": 2,
+              "weight_kg": 7.5
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T09:17:00"
+        },
+        {
+          "id": "ORD-ASIG-003",
+          "customer_name": "Sofía Sánchez",
+          "customer_phone": "+598 95 446 853",
+          "delivery_address": "Mercedes 349, Montevideo",
+          "delivery_location": {
+            "lat": -34.891602,
+            "lon": -56.184561,
+            "address": "Mercedes 349, Montevideo"
+          },
+          "deadline": "2025-10-24T19:30:00",
+          "priority": "low",
+          "estimated_duration": 8,
+          "items": [
+            {
+              "name": "Cable HDMI",
+              "quantity": 1,
+              "weight_kg": 0.1
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T10:18:00"
+        }
+      ],
+      "capacity": 6,
+      "current_load": 3,
+      "max_weight_kg": 30,
+      "current_weight_kg": 33.1,
+      "performance_score": 0.71,
+      "total_deliveries": 540,
+      "success_rate": 0.88,
+      "average_delay_minutes": 9.6
+    },
+    {
+      "id": "AUTO-002",
+      "driver_name": "Elena Rodríguez",
+      "driver_phone": "+598 99 148 708",
+      "vehicle_type": "auto",
+      "license_plate": "SEH-1648",
+      "current_location": {
+        "lat": -34.892086,
+        "lon": -56.196815,
+        "address": "Av. Brasil 1611, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-ASIG-004",
+          "customer_name": "Carmen Herrera",
+          "customer_phone": "+598 96 826 774",
+          "delivery_address": "Colonia 1417, Montevideo",
+          "delivery_location": {
+            "lat": -34.897932,
+            "lon": -56.190713,
+            "address": "Colonia 1417, Montevideo"
+          },
+          "deadline": "2025-10-24T18:00:00",
+          "priority": "low",
+          "estimated_duration": 3,
+          "items": [
+            {
+              "name": "Router WiFi",
+              "quantity": 1,
+              "weight_kg": 0.6
+            },
+            {
+              "name": "Impresora",
+              "quantity": 2,
+              "weight_kg": 7.5
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T13:05:00"
+        },
+        {
+          "id": "ORD-ASIG-005",
+          "customer_name": "Roberto García",
+          "customer_phone": "+598 92 231 658",
+          "delivery_address": "Bvar. Artigas 2276, Montevideo",
+          "delivery_location": {
+            "lat": -34.907557,
+            "lon": -56.15221,
+            "address": "Bvar. Artigas 2276, Montevideo"
+          },
+          "deadline": "2025-10-24T17:00:00",
+          "priority": "high",
+          "estimated_duration": 7,
+          "items": [
+            {
+              "name": "Impresora",
+              "quantity": 1,
+              "weight_kg": 7.5
+            },
+            {
+              "name": "Mouse",
+              "quantity": 1,
+              "weight_kg": 0.2
+            },
+            {
+              "name": "Mouse",
+              "quantity": 2,
+              "weight_kg": 0.2
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T12:55:00"
+        },
+        {
+          "id": "ORD-ASIG-006",
+          "customer_name": "Gabriel Morales",
+          "customer_phone": "+598 94 996 190",
+          "delivery_address": "18 de Julio 986, Montevideo",
+          "delivery_location": {
+            "lat": -34.896286,
+            "lon": -56.184579,
+            "address": "18 de Julio 986, Montevideo"
+          },
+          "deadline": "2025-10-24T18:00:00",
+          "priority": "urgent",
+          "estimated_duration": 6,
+          "items": [
+            {
+              "name": "Tablet",
+              "quantity": 2,
+              "weight_kg": 0.5
+            },
+            {
+              "name": "Impresora",
+              "quantity": 2,
+              "weight_kg": 7.5
+            },
+            {
+              "name": "Auriculares",
+              "quantity": 1,
+              "weight_kg": 0.3
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T10:43:00"
+        },
+        {
+          "id": "ORD-ASIG-007",
+          "customer_name": "Diego Fernández",
+          "customer_phone": "+598 99 745 243",
+          "delivery_address": "Soriano 358, Montevideo",
+          "delivery_location": {
+            "lat": -34.894637,
+            "lon": -56.170113,
+            "address": "Soriano 358, Montevideo"
+          },
+          "deadline": "2025-10-24T16:15:00",
+          "priority": "low",
+          "estimated_duration": 6,
+          "items": [
+            {
+              "name": "Cable HDMI",
+              "quantity": 2,
+              "weight_kg": 0.1
+            },
+            {
+              "name": "Mouse",
+              "quantity": 1,
+              "weight_kg": 0.2
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T11:55:00"
+        }
+      ],
+      "capacity": 8,
+      "current_load": 4,
+      "max_weight_kg": 150,
+      "current_weight_kg": 40.4,
+      "performance_score": 0.82,
+      "total_deliveries": 249,
+      "success_rate": 0.92,
+      "average_delay_minutes": 5.3
+    },
+    {
+      "id": "MOTO-003",
+      "driver_name": "Carlos Morales",
+      "driver_phone": "+598 94 638 714",
+      "vehicle_type": "moto",
+      "license_plate": "SCD-8937",
+      "current_location": {
+        "lat": -34.905245,
+        "lon": -56.157001,
+        "address": "Colón 2577, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-ASIG-008",
+          "customer_name": "María Sánchez",
+          "customer_phone": "+598 92 840 698",
+          "delivery_address": "Soriano 1668, Montevideo",
+          "delivery_location": {
+            "lat": -34.902246,
+            "lon": -56.158467,
+            "address": "Soriano 1668, Montevideo"
+          },
+          "deadline": "2025-10-24T19:45:00",
+          "priority": "low",
+          "estimated_duration": 6,
+          "items": [
+            {
+              "name": "Tablet",
+              "quantity": 1,
+              "weight_kg": 0.5
+            },
+            {
+              "name": "Webcam",
+              "quantity": 2,
+              "weight_kg": 0.4
+            },
+            {
+              "name": "Hub USB",
+              "quantity": 1,
+              "weight_kg": 0.2
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T10:25:00"
+        },
+        {
+          "id": "ORD-ASIG-009",
+          "customer_name": "Valentina García",
+          "customer_phone": "+598 92 372 766",
+          "delivery_address": "Comercio 2283, Montevideo",
+          "delivery_location": {
+            "lat": -34.890308,
+            "lon": -56.182622,
+            "address": "Comercio 2283, Montevideo"
+          },
+          "deadline": "2025-10-24T18:15:00",
+          "priority": "low",
+          "estimated_duration": 7,
+          "items": [
+            {
+              "name": "Teclado",
+              "quantity": 2,
+              "weight_kg": 0.8
+            },
+            {
+              "name": "Notebook HP",
+              "quantity": 1,
+              "weight_kg": 2.5
+            },
+            {
+              "name": "Cable HDMI",
+              "quantity": 2,
+              "weight_kg": 0.1
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T11:06:00"
+        },
+        {
+          "id": "ORD-ASIG-010",
+          "customer_name": "Lucía López",
+          "customer_phone": "+598 95 356 693",
+          "delivery_address": "Constituyente 1264, Montevideo",
+          "delivery_location": {
+            "lat": -34.898556,
+            "lon": -56.157345,
+            "address": "Constituyente 1264, Montevideo"
+          },
+          "deadline": "2025-10-24T19:15:00",
+          "priority": "medium",
+          "estimated_duration": 3,
+          "items": [
+            {
+              "name": "Monitor 24\"",
+              "quantity": 2,
+              "weight_kg": 6.0
+            },
+            {
+              "name": "Cable HDMI",
+              "quantity": 1,
+              "weight_kg": 0.1
+            },
+            {
+              "name": "Tablet",
+              "quantity": 2,
+              "weight_kg": 0.5
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T09:20:00"
+        }
+      ],
+      "capacity": 6,
+      "current_load": 3,
+      "max_weight_kg": 30,
+      "current_weight_kg": 18.9,
+      "performance_score": 0.86,
+      "total_deliveries": 416,
+      "success_rate": 0.93,
+      "average_delay_minutes": 8.5
+    },
+    {
+      "id": "CAMIONETA-004",
+      "driver_name": "Lucía Martínez",
+      "driver_phone": "+598 99 953 643",
+      "vehicle_type": "camioneta",
+      "license_plate": "SBA-1015",
+      "current_location": {
+        "lat": -34.909882,
+        "lon": -56.19746,
+        "address": "San José 1839, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-ASIG-011",
+          "customer_name": "Lucía Rodríguez",
+          "customer_phone": "+598 99 115 478",
+          "delivery_address": "San José 3715, Montevideo",
+          "delivery_location": {
+            "lat": -34.894817,
+            "lon": -56.163353,
+            "address": "San José 3715, Montevideo"
+          },
+          "deadline": "2025-10-24T16:15:00",
+          "priority": "low",
+          "estimated_duration": 5,
+          "items": [
+            {
+              "name": "Webcam",
+              "quantity": 1,
+              "weight_kg": 0.4
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T10:07:00"
+        },
+        {
+          "id": "ORD-ASIG-012",
+          "customer_name": "Roberto Silva",
+          "customer_phone": "+598 91 923 725",
+          "delivery_address": "Av. Brasil 2491, Montevideo",
+          "delivery_location": {
+            "lat": -34.891477,
+            "lon": -56.195658,
+            "address": "Av. Brasil 2491, Montevideo"
+          },
+          "deadline": "2025-10-24T16:00:00",
+          "priority": "urgent",
+          "estimated_duration": 4,
+          "items": [
+            {
+              "name": "Auriculares",
+              "quantity": 1,
+              "weight_kg": 0.3
+            },
+            {
+              "name": "Notebook HP",
+              "quantity": 1,
+              "weight_kg": 2.5
+            },
+            {
+              "name": "Hub USB",
+              "quantity": 2,
+              "weight_kg": 0.2
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T13:04:00"
+        },
+        {
+          "id": "ORD-ASIG-013",
+          "customer_name": "Gabriel Pérez",
+          "customer_phone": "+598 95 543 389",
+          "delivery_address": "Av. 8 de Octubre 2850, Montevideo",
+          "delivery_location": {
+            "lat": -34.904761,
+            "lon": -56.166573,
+            "address": "Av. 8 de Octubre 2850, Montevideo"
+          },
+          "deadline": "2025-10-24T16:15:00",
+          "priority": "medium",
+          "estimated_duration": 8,
+          "items": [
+            {
+              "name": "Tablet",
+              "quantity": 1,
+              "weight_kg": 0.5
+            },
+            {
+              "name": "Cable HDMI",
+              "quantity": 1,
+              "weight_kg": 0.1
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T10:21:00"
+        },
+        {
+          "id": "ORD-ASIG-014",
+          "customer_name": "Patricia Sánchez",
+          "customer_phone": "+598 91 423 322",
+          "delivery_address": "Soriano 3307, Montevideo",
+          "delivery_location": {
+            "lat": -34.890085,
+            "lon": -56.190061,
+            "address": "Soriano 3307, Montevideo"
+          },
+          "deadline": "2025-10-24T19:45:00",
+          "priority": "low",
+          "estimated_duration": 7,
+          "items": [
+            {
+              "name": "Auriculares",
+              "quantity": 1,
+              "weight_kg": 0.3
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T10:52:00"
+        }
+      ],
+      "capacity": 10,
+      "current_load": 4,
+      "max_weight_kg": 500,
+      "current_weight_kg": 4.5,
+      "performance_score": 0.86,
+      "total_deliveries": 266,
+      "success_rate": 0.93,
+      "average_delay_minutes": 9.5
+    },
+    {
+      "id": "AUTO-005",
+      "driver_name": "Diego Martínez",
+      "driver_phone": "+598 92 984 660",
+      "vehicle_type": "auto",
+      "license_plate": "SDB-8090",
+      "current_location": {
+        "lat": -34.896737,
+        "lon": -56.189188,
+        "address": "Comercio 2420, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-ASIG-015",
+          "customer_name": "Andrés López",
+          "customer_phone": "+598 92 786 161",
+          "delivery_address": "Mercedes 835, Montevideo",
+          "delivery_location": {
+            "lat": -34.901806,
+            "lon": -56.151498,
+            "address": "Mercedes 835, Montevideo"
+          },
+          "deadline": "2025-10-24T16:00:00",
+          "priority": "high",
+          "estimated_duration": 3,
+          "items": [
+            {
+              "name": "Cable HDMI",
+              "quantity": 2,
+              "weight_kg": 0.1
+            },
+            {
+              "name": "Mouse",
+              "quantity": 1,
+              "weight_kg": 0.2
+            },
+            {
+              "name": "Monitor 24\"",
+              "quantity": 2,
+              "weight_kg": 6.0
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T09:13:00"
+        },
+        {
+          "id": "ORD-ASIG-016",
+          "customer_name": "Ana Silva",
+          "customer_phone": "+598 91 348 996",
+          "delivery_address": "Av. Millán 1208, Montevideo",
+          "delivery_location": {
+            "lat": -34.898892,
+            "lon": -56.179785,
+            "address": "Av. Millán 1208, Montevideo"
+          },
+          "deadline": "2025-10-24T19:15:00",
+          "priority": "medium",
+          "estimated_duration": 8,
+          "items": [
+            {
+              "name": "Hub USB",
+              "quantity": 2,
+              "weight_kg": 0.2
+            },
+            {
+              "name": "Tablet",
+              "quantity": 1,
+              "weight_kg": 0.5
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T10:18:00"
+        },
+        {
+          "id": "ORD-ASIG-017",
+          "customer_name": "Valentina Fernández",
+          "customer_phone": "+598 97 691 388",
+          "delivery_address": "Rivera 1239, Montevideo",
+          "delivery_location": {
+            "lat": -34.899572,
+            "lon": -56.183468,
+            "address": "Rivera 1239, Montevideo"
+          },
+          "deadline": "2025-10-24T19:15:00",
+          "priority": "high",
+          "estimated_duration": 8,
+          "items": [
+            {
+              "name": "Router WiFi",
+              "quantity": 1,
+              "weight_kg": 0.6
+            },
+            {
+              "name": "Webcam",
+              "quantity": 1,
+              "weight_kg": 0.4
+            },
+            {
+              "name": "Monitor 24\"",
+              "quantity": 2,
+              "weight_kg": 6.0
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T11:51:00"
+        }
+      ],
+      "capacity": 8,
+      "current_load": 3,
+      "max_weight_kg": 150,
+      "current_weight_kg": 26.3,
+      "performance_score": 0.79,
+      "total_deliveries": 122,
+      "success_rate": 0.98,
+      "average_delay_minutes": 7.8
+    },
+    {
+      "id": "MOTO-006",
+      "driver_name": "Pedro Flores",
+      "driver_phone": "+598 98 953 409",
+      "vehicle_type": "moto",
+      "license_plate": "SCB-4311",
+      "current_location": {
+        "lat": -34.900908,
+        "lon": -56.182641,
+        "address": "Rambla República de México 1600, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-ASIG-018",
+          "customer_name": "Carlos Martínez",
+          "customer_phone": "+598 94 157 252",
+          "delivery_address": "Rambla República de México 3549, Montevideo",
+          "delivery_location": {
+            "lat": -34.907117,
+            "lon": -56.158634,
+            "address": "Rambla República de México 3549, Montevideo"
+          },
+          "deadline": "2025-10-24T19:00:00",
+          "priority": "low",
+          "estimated_duration": 5,
+          "items": [
+            {
+              "name": "Monitor 24\"",
+              "quantity": 1,
+              "weight_kg": 6.0
+            },
+            {
+              "name": "Teclado",
+              "quantity": 1,
+              "weight_kg": 0.8
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T09:52:00"
+        },
+        {
+          "id": "ORD-ASIG-019",
+          "customer_name": "Fernando Silva",
+          "customer_phone": "+598 98 457 495",
+          "delivery_address": "Yaguarón 395, Montevideo",
+          "delivery_location": {
+            "lat": -34.899234,
+            "lon": -56.194559,
+            "address": "Yaguarón 395, Montevideo"
+          },
+          "deadline": "2025-10-24T16:30:00",
+          "priority": "urgent",
+          "estimated_duration": 8,
+          "items": [
+            {
+              "name": "Hub USB",
+              "quantity": 1,
+              "weight_kg": 0.2
+            },
+            {
+              "name": "Impresora",
+              "quantity": 2,
+              "weight_kg": 7.5
+            },
+            {
+              "name": "Webcam",
+              "quantity": 1,
+              "weight_kg": 0.4
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T11:35:00"
+        },
+        {
+          "id": "ORD-ASIG-020",
+          "customer_name": "Andrés Herrera",
+          "customer_phone": "+598 95 560 554",
+          "delivery_address": "Ejido 151, Montevideo",
+          "delivery_location": {
+            "lat": -34.891845,
+            "lon": -56.188605,
+            "address": "Ejido 151, Montevideo"
+          },
+          "deadline": "2025-10-24T19:00:00",
+          "priority": "high",
+          "estimated_duration": 3,
+          "items": [
+            {
+              "name": "Tablet",
+              "quantity": 1,
+              "weight_kg": 0.5
+            },
+            {
+              "name": "Monitor 24\"",
+              "quantity": 2,
+              "weight_kg": 6.0
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T09:46:00"
+        },
+        {
+          "id": "ORD-ASIG-021",
+          "customer_name": "Carmen Pérez",
+          "customer_phone": "+598 98 484 145",
+          "delivery_address": "Colón 482, Montevideo",
+          "delivery_location": {
+            "lat": -34.898594,
+            "lon": -56.180111,
+            "address": "Colón 482, Montevideo"
+          },
+          "deadline": "2025-10-24T17:30:00",
+          "priority": "urgent",
+          "estimated_duration": 3,
+          "items": [
+            {
+              "name": "Disco SSD",
+              "quantity": 2,
+              "weight_kg": 0.15
+            },
+            {
+              "name": "Notebook HP",
+              "quantity": 1,
+              "weight_kg": 2.5
+            }
+          ],
+          "status": "assigned",
+          "assigned_at": "2025-10-24T12:46:00"
+        }
+      ],
+      "capacity": 6,
+      "current_load": 4,
+      "max_weight_kg": 30,
+      "current_weight_kg": 37.7,
+      "performance_score": 0.72,
+      "total_deliveries": 159,
+      "success_rate": 0.88,
+      "average_delay_minutes": 4.2
+    }
+  ],
+  "config": {
+    "default_max_capacity": 6,
+    "weight_distance": 0.25,
+    "weight_capacity": 0.2,
+    "weight_time_urgency": 0.25,
+    "weight_route_compatibility": 0.1,
+    "weight_vehicle_performance": 0.05,
+    "weight_interference": 0.15,
+    "max_route_time_minutes": 180,
+    "service_time_per_delivery_minutes": 5,
+    "average_speed_kmh": 25,
+    "consider_traffic": true,
+    "optimize_route_order": true
+  },
+  "fast_mode": true,
+  "max_candidates_per_order": 3
+}

@@ -1,0 +1,237 @@
+{
+  "orders": [
+    {
+      "id": "ORD-BATCH-001",
+      "customer_name": "Lucía Rodríguez",
+      "customer_phone": "+598 92 111 222",
+      "delivery_address": "Mercedes 1234, Montevideo, Uruguay",
+      "delivery_location": {
+        "lat": -34.908000,
+        "lon": -56.192000,
+        "address": "Mercedes 1234, Montevideo"
+      },
+      "deadline": "2025-10-24T17:30:00",
+      "priority": "urgent",
+      "estimated_duration": 5,
+      "items": [
+        {
+          "name": "Laptop HP",
+          "quantity": 1,
+          "weight_kg": 2.2
+        }
+      ]
+    },
+    {
+      "id": "ORD-BATCH-002",
+      "customer_name": "Pedro Martínez",
+      "customer_phone": "+598 92 333 444",
+      "delivery_address": "Constituyente 1500, Montevideo, Uruguay",
+      "delivery_location": {
+        "lat": -34.898000,
+        "lon": -56.178000,
+        "address": "Constituyente 1500, Montevideo"
+      },
+      "deadline": "2025-10-24T18:00:00",
+      "priority": "high",
+      "estimated_duration": 6,
+      "items": [
+        {
+          "name": "Monitor Samsung 27\"",
+          "quantity": 1,
+          "weight_kg": 5.5
+        }
+      ]
+    },
+    {
+      "id": "ORD-BATCH-003",
+      "customer_name": "Ana García",
+      "customer_phone": "+598 92 555 666",
+      "delivery_address": "Colonia 850, Montevideo, Uruguay",
+      "delivery_location": {
+        "lat": -34.905500,
+        "lon": -56.196000,
+        "address": "Colonia 850, Montevideo"
+      },
+      "deadline": "2025-10-24T18:30:00",
+      "priority": "medium",
+      "estimated_duration": 4,
+      "items": [
+        {
+          "name": "Teclado mecánico",
+          "quantity": 1,
+          "weight_kg": 1.0
+        },
+        {
+          "name": "Mouse gaming",
+          "quantity": 1,
+          "weight_kg": 0.3
+        }
+      ]
+    },
+    {
+      "id": "ORD-BATCH-004",
+      "customer_name": "Carlos López",
+      "customer_phone": "+598 92 777 888",
+      "delivery_address": "Av. Italia 3500, Montevideo, Uruguay",
+      "delivery_location": {
+        "lat": -34.895000,
+        "lon": -56.155000,
+        "address": "Av. Italia 3500, Montevideo"
+      },
+      "deadline": "2025-10-24T19:00:00",
+      "priority": "low",
+      "estimated_duration": 3,
+      "items": [
+        {
+          "name": "Cable HDMI",
+          "quantity": 2,
+          "weight_kg": 0.2
+        }
+      ]
+    },
+    {
+      "id": "ORD-BATCH-005",
+      "customer_name": "María Fernández",
+      "customer_phone": "+598 92 999 000",
+      "delivery_address": "Bvar. Artigas 1200, Montevideo, Uruguay",
+      "delivery_location": {
+        "lat": -34.903000,
+        "lon": -56.172000,
+        "address": "Bvar. Artigas 1200, Montevideo"
+      },
+      "deadline": "2025-10-24T17:45:00",
+      "priority": "urgent",
+      "estimated_duration": 7,
+      "items": [
+        {
+          "name": "Impresora Epson",
+          "quantity": 1,
+          "weight_kg": 8.5
+        }
+      ]
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "MOTO-001",
+      "driver_name": "Carlos Martínez",
+      "driver_phone": "+598 91 234 567",
+      "vehicle_type": "moto",
+      "license_plate": "SAC-1234",
+      "current_location": {
+        "lat": -34.900000,
+        "lon": -56.195000,
+        "address": "Av. Italia 2500, Montevideo"
+      },
+      "current_orders": [],
+      "capacity": 6,
+      "current_load": 0,
+      "max_weight_kg": 30,
+      "current_weight_kg": 0,
+      "performance_score": 0.92,
+      "total_deliveries": 487,
+      "success_rate": 0.96,
+      "average_delay_minutes": 2.3
+    },
+    {
+      "id": "AUTO-002",
+      "driver_name": "Ana Rodríguez",
+      "driver_phone": "+598 93 456 789",
+      "vehicle_type": "auto",
+      "license_plate": "SBM-5678",
+      "current_location": {
+        "lat": -34.910000,
+        "lon": -56.165000,
+        "address": "Rambla República de México 6000, Montevideo"
+      },
+      "current_orders": [],
+      "capacity": 8,
+      "current_load": 0,
+      "max_weight_kg": 150,
+      "current_weight_kg": 0,
+      "performance_score": 0.88,
+      "total_deliveries": 312,
+      "success_rate": 0.91,
+      "average_delay_minutes": 4.7
+    },
+    {
+      "id": "MOTO-003",
+      "driver_name": "Jorge Silva",
+      "driver_phone": "+598 94 567 890",
+      "vehicle_type": "moto",
+      "license_plate": "SCC-2345",
+      "current_location": {
+        "lat": -34.895000,
+        "lon": -56.210000,
+        "address": "Av. Luis Alberto de Herrera 3500, Montevideo"
+      },
+      "current_orders": [],
+      "capacity": 6,
+      "current_load": 0,
+      "max_weight_kg": 30,
+      "current_weight_kg": 0,
+      "performance_score": 0.75,
+      "total_deliveries": 156,
+      "success_rate": 0.82,
+      "average_delay_minutes": 8.5
+    },
+    {
+      "id": "CAMIONETA-004",
+      "driver_name": "Patricia Morales",
+      "driver_phone": "+598 95 678 901",
+      "vehicle_type": "camioneta",
+      "license_plate": "SDH-3456",
+      "current_location": {
+        "lat": -34.920000,
+        "lon": -56.145000,
+        "address": "Av. José Belloni 4200, Montevideo"
+      },
+      "current_orders": [],
+      "capacity": 10,
+      "current_load": 0,
+      "max_weight_kg": 500,
+      "current_weight_kg": 0,
+      "performance_score": 0.95,
+      "total_deliveries": 624,
+      "success_rate": 0.97,
+      "average_delay_minutes": 1.8
+    },
+    {
+      "id": "AUTO-005",
+      "driver_name": "Miguel Herrera",
+      "driver_phone": "+598 96 789 012",
+      "vehicle_type": "auto",
+      "license_plate": "SEP-4567",
+      "current_location": {
+        "lat": -34.908000,
+        "lon": -56.220000,
+        "address": "Av. Rivera 3200, Montevideo"
+      },
+      "current_orders": [],
+      "capacity": 8,
+      "current_load": 0,
+      "max_weight_kg": 150,
+      "current_weight_kg": 0,
+      "performance_score": 0.68,
+      "total_deliveries": 89,
+      "success_rate": 0.79,
+      "average_delay_minutes": 12.3
+    }
+  ],
+  "config": {
+    "default_max_capacity": 6,
+    "weight_distance": 0.25,
+    "weight_capacity": 0.20,
+    "weight_time_urgency": 0.25,
+    "weight_route_compatibility": 0.10,
+    "weight_vehicle_performance": 0.05,
+    "weight_interference": 0.15,
+    "max_route_time_minutes": 180,
+    "service_time_per_delivery_minutes": 5,
+    "average_speed_kmh": 25,
+    "consider_traffic": true,
+    "optimize_route_order": true
+  },
+  "fast_mode": true,
+  "max_candidates_per_order": 3
+}

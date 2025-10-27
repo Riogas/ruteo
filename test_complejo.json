@@ -1,0 +1,274 @@
+{
+  "order": {
+    "id": "ORD-2025-URGENTE-001",
+    "customer_name": "Roberto González",
+    "customer_phone": "+598 92 456 789",
+    "delivery_address": "Av. 18 de Julio 1234, Montevideo, Uruguay",
+    "delivery_location": {
+      "lat": -34.905000,
+      "lon": -56.188000,
+      "address": "Av. 18 de Julio 1234, Montevideo"
+    },
+    "deadline": "2025-10-24T18:30:00",
+    "priority": "urgent",
+    "estimated_duration": 8,
+    "special_instructions": "Tocar timbre 3 veces. Edificio con portero. Requiere firma digital.",
+    "items": [
+      {
+        "name": "Notebook Dell Inspiron 15",
+        "quantity": 1,
+        "weight_kg": 2.5
+      },
+      {
+        "name": "Mouse inalámbrico",
+        "quantity": 2,
+        "weight_kg": 0.3
+      }
+    ]
+  },
+  "vehicles": [
+    {
+      "id": "MOTO-001",
+      "driver_name": "Carlos Martínez",
+      "driver_phone": "+598 91 234 567",
+      "vehicle_type": "moto",
+      "license_plate": "SAC-1234",
+      "current_location": {
+        "lat": -34.900000,
+        "lon": -56.195000,
+        "address": "Av. Italia 2500, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-100",
+          "customer_name": "María López",
+          "delivery_location": {
+            "lat": -34.903000,
+            "lon": -56.192000,
+            "address": "Av. Brasil 2800, Montevideo"
+          },
+          "deadline": "2025-10-24T17:45:00",
+          "priority": "high",
+          "estimated_duration": 5
+        },
+        {
+          "id": "ORD-101",
+          "customer_name": "Juan Pérez",
+          "delivery_location": {
+            "lat": -34.907000,
+            "lon": -56.185000,
+            "address": "Bulevar Artigas 1500, Montevideo"
+          },
+          "deadline": "2025-10-24T18:15:00",
+          "priority": "medium",
+          "estimated_duration": 3
+        }
+      ],
+      "capacity": 6,
+      "current_load": 2,
+      "max_weight_kg": 30,
+      "current_weight_kg": 8.5,
+      "performance_score": 0.92,
+      "total_deliveries": 487,
+      "success_rate": 0.96,
+      "average_delay_minutes": 2.3
+    },
+    {
+      "id": "AUTO-002",
+      "driver_name": "Ana Rodríguez",
+      "driver_phone": "+598 93 456 789",
+      "vehicle_type": "auto",
+      "license_plate": "SBM-5678",
+      "current_location": {
+        "lat": -34.910000,
+        "lon": -56.165000,
+        "address": "Rambla República de México 6000, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-200",
+          "customer_name": "Sofía Gómez",
+          "delivery_location": {
+            "lat": -34.908000,
+            "lon": -56.170000,
+            "address": "Av. Agraciada 2300, Montevideo"
+          },
+          "deadline": "2025-10-24T17:30:00",
+          "priority": "urgent",
+          "estimated_duration": 4
+        },
+        {
+          "id": "ORD-201",
+          "customer_name": "Diego Fernández",
+          "delivery_location": {
+            "lat": -34.912000,
+            "lon": -56.175000,
+            "address": "Av. 8 de Octubre 2500, Montevideo"
+          },
+          "deadline": "2025-10-24T18:00:00",
+          "priority": "high",
+          "estimated_duration": 6
+        },
+        {
+          "id": "ORD-202",
+          "customer_name": "Laura Sánchez",
+          "delivery_location": {
+            "lat": -34.907000,
+            "lon": -56.180000,
+            "address": "Bulevar España 2200, Montevideo"
+          },
+          "deadline": "2025-10-24T18:45:00",
+          "priority": "medium",
+          "estimated_duration": 5
+        }
+      ],
+      "capacity": 8,
+      "current_load": 3,
+      "max_weight_kg": 150,
+      "current_weight_kg": 45.2,
+      "performance_score": 0.88,
+      "total_deliveries": 312,
+      "success_rate": 0.91,
+      "average_delay_minutes": 4.7
+    },
+    {
+      "id": "MOTO-003",
+      "driver_name": "Jorge Silva",
+      "driver_phone": "+598 94 567 890",
+      "vehicle_type": "moto",
+      "license_plate": "SCC-2345",
+      "current_location": {
+        "lat": -34.895000,
+        "lon": -56.210000,
+        "address": "Av. Luis Alberto de Herrera 3500, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-300",
+          "customer_name": "Martín Ruiz",
+          "delivery_location": {
+            "lat": -34.897000,
+            "lon": -56.205000,
+            "address": "Bulevar Batlle y Ordóñez 2800, Montevideo"
+          },
+          "deadline": "2025-10-24T19:00:00",
+          "priority": "low",
+          "estimated_duration": 3
+        }
+      ],
+      "capacity": 6,
+      "current_load": 1,
+      "max_weight_kg": 30,
+      "current_weight_kg": 3.2,
+      "performance_score": 0.75,
+      "total_deliveries": 156,
+      "success_rate": 0.82,
+      "average_delay_minutes": 8.5
+    },
+    {
+      "id": "CAMIONETA-004",
+      "driver_name": "Patricia Morales",
+      "driver_phone": "+598 95 678 901",
+      "vehicle_type": "camioneta",
+      "license_plate": "SDH-3456",
+      "current_location": {
+        "lat": -34.920000,
+        "lon": -56.145000,
+        "address": "Av. José Belloni 4200, Montevideo"
+      },
+      "current_orders": [
+        {
+          "id": "ORD-400",
+          "customer_name": "Ricardo Torres",
+          "delivery_location": {
+            "lat": -34.918000,
+            "lon": -56.155000,
+            "address": "Av. Millán 3800, Montevideo"
+          },
+          "deadline": "2025-10-24T17:20:00",
+          "priority": "urgent",
+          "estimated_duration": 7
+        },
+        {
+          "id": "ORD-401",
+          "customer_name": "Gabriela Vega",
+          "delivery_location": {
+            "lat": -34.925000,
+            "lon": -56.150000,
+            "address": "Camino Carrasco 5200, Montevideo"
+          },
+          "deadline": "2025-10-24T17:50:00",
+          "priority": "high",
+          "estimated_duration": 10
+        },
+        {
+          "id": "ORD-402",
+          "customer_name": "Fernando Castro",
+          "delivery_location": {
+            "lat": -34.915000,
+            "lon": -56.160000,
+            "address": "Av. Propios 2500, Montevideo"
+          },
+          "deadline": "2025-10-24T18:20:00",
+          "priority": "high",
+          "estimated_duration": 8
+        },
+        {
+          "id": "ORD-403",
+          "customer_name": "Valeria Romero",
+          "delivery_location": {
+            "lat": -34.922000,
+            "lon": -56.165000,
+            "address": "Av. Gral. Flores 3200, Montevideo"
+          },
+          "deadline": "2025-10-24T19:15:00",
+          "priority": "medium",
+          "estimated_duration": 6
+        }
+      ],
+      "capacity": 10,
+      "current_load": 4,
+      "max_weight_kg": 500,
+      "current_weight_kg": 125.8,
+      "performance_score": 0.95,
+      "total_deliveries": 624,
+      "success_rate": 0.97,
+      "average_delay_minutes": 1.8
+    },
+    {
+      "id": "AUTO-005",
+      "driver_name": "Miguel Herrera",
+      "driver_phone": "+598 96 789 012",
+      "vehicle_type": "auto",
+      "license_plate": "SEP-4567",
+      "current_location": {
+        "lat": -34.908000,
+        "lon": -56.220000,
+        "address": "Av. Rivera 3200, Montevideo"
+      },
+      "current_orders": [],
+      "capacity": 8,
+      "current_load": 0,
+      "max_weight_kg": 150,
+      "current_weight_kg": 0,
+      "performance_score": 0.68,
+      "total_deliveries": 89,
+      "success_rate": 0.79,
+      "average_delay_minutes": 12.3
+    }
+  ],
+  "config": {
+    "default_max_capacity": 6,
+    "weight_distance": 0.25,
+    "weight_capacity": 0.20,
+    "weight_time_urgency": 0.25,
+    "weight_route_compatibility": 0.10,
+    "weight_vehicle_performance": 0.05,
+    "weight_interference": 0.15,
+    "max_route_time_minutes": 180,
+    "service_time_per_delivery_minutes": 5,
+    "average_speed_kmh": 25,
+    "consider_traffic": true,
+    "optimize_route_order": true
+  }
+}

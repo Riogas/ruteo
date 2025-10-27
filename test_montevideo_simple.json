@@ -1,0 +1,103 @@
+{
+  "order": {
+    "id": "ORD-2025-URGENTE-001",
+    "customer_name": "Roberto González",
+    "customer_phone": "+598 92 456 789",
+    "delivery_location": {
+      "lat": -34.905000,
+      "lon": -56.188000
+    },
+    "deadline": "2025-10-24T18:30:00",
+    "priority": "urgent",
+    "estimated_duration": 8,
+    "notes": "Tocar timbre 3 veces. Edificio con portero. Requiere firma digital. Productos: Notebook Dell + Mouse inalámbrico",
+    "weight_kg": 2.8
+  },
+  "available_vehicles": [
+    {
+      "id": "MOTO-001",
+      "driver_name": "Carlos Martínez",
+      "driver_phone": "+598 91 234 567",
+      "vehicle_type": "moto",
+      "license_plate": "SAC-1234",
+      "current_location": {
+        "lat": -34.900000,
+        "lon": -56.195000
+      },
+      "current_orders": ["ORD-100", "ORD-101"],
+      "max_capacity": 6,
+      "current_load": 2,
+      "max_weight_kg": 30,
+      "success_rate": 0.96,
+      "total_deliveries": 487
+    },
+    {
+      "id": "AUTO-002",
+      "driver_name": "Ana Rodríguez",
+      "driver_phone": "+598 93 456 789",
+      "vehicle_type": "auto",
+      "license_plate": "SBM-5678",
+      "current_location": {
+        "lat": -34.910000,
+        "lon": -56.165000
+      },
+      "current_orders": ["ORD-200", "ORD-201", "ORD-202"],
+      "max_capacity": 8,
+      "current_load": 3,
+      "max_weight_kg": 150,
+      "success_rate": 0.91,
+      "total_deliveries": 312
+    },
+    {
+      "id": "MOTO-003",
+      "driver_name": "Jorge Silva",
+      "driver_phone": "+598 94 567 890",
+      "vehicle_type": "moto",
+      "license_plate": "SCC-2345",
+      "current_location": {
+        "lat": -34.895000,
+        "lon": -56.210000
+      },
+      "current_orders": ["ORD-300"],
+      "max_capacity": 6,
+      "current_load": 1,
+      "max_weight_kg": 30,
+      "success_rate": 0.82,
+      "total_deliveries": 156
+    },
+    {
+      "id": "CAMIONETA-004",
+      "driver_name": "Patricia Morales",
+      "driver_phone": "+598 95 678 901",
+      "vehicle_type": "camioneta",
+      "license_plate": "SDH-3456",
+      "current_location": {
+        "lat": -34.920000,
+        "lon": -56.145000
+      },
+      "current_orders": ["ORD-400", "ORD-401", "ORD-402", "ORD-403"],
+      "max_capacity": 10,
+      "current_load": 4,
+      "max_weight_kg": 500,
+      "success_rate": 0.97,
+      "total_deliveries": 624
+    },
+    {
+      "id": "AUTO-005",
+      "driver_name": "Miguel Herrera",
+      "driver_phone": "+598 96 789 012",
+      "vehicle_type": "auto",
+      "license_plate": "SEP-4567",
+      "current_location": {
+        "lat": -34.908000,
+        "lon": -56.220000
+      },
+      "current_orders": [],
+      "max_capacity": 8,
+      "current_load": 0,
+      "max_weight_kg": 150,
+      "success_rate": 0.79,
+      "total_deliveries": 89
+    }
+  ]
+}

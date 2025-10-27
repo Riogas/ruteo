@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # API del sistema de ruteo
+  ruteo-api:
+    build: .
+    container_name: ruteo-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - HOST=0.0.0.0
+      - PORT=8000
+      - GEOCODING_PROVIDER=nominatim
+    volumes:
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  
+  # Redis (opcional, para cache)
+  redis:
+    image: redis:7-alpine
+    container_name: ruteo-redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+networks:
+  default:
+    name: ruteo-network

@@ -1,0 +1,83 @@
+geocoding:
+  # Proveedor preferido: 'google', 'opencage', 'nominatim'
+  provider: nominatim
+  timeout: 10
+  cache_enabled: true
+  
+routing:
+  # Tipo de red: 'drive', 'drive_service', 'walk', 'bike'
+  network_type: drive
+  # Considerar restricciones de sentido único
+  use_directed_graph: true
+  # Radio de búsqueda para rutas (metros)
+  search_radius: 50000
+  # Considerar tráfico (si está disponible)
+  consider_traffic: true
+  
+optimization:
+  # Algoritmo: 'greedy', 'genetic', 'simulated_annealing', 'ortools'
+  algorithm: ortools
+  # Tiempo máximo de cálculo (segundos)
+  max_computation_time: 10
+  # Número de soluciones a explorar
+  num_solutions: 100
+  
+scoring:
+  # Pesos para el cálculo de score (deben sumar 1.0)
+  weights:
+    distance: 0.30          # Distancia al nuevo pedido
+    capacity: 0.20          # Capacidad disponible del vehículo
+    time_urgency: 0.25      # Urgencia temporal del pedido
+    route_compatibility: 0.15  # Qué tan bien encaja en ruta actual
+    vehicle_performance: 0.10  # Historial del conductor
+  
+  # Penalizaciones
+  penalties:
+    over_capacity: 0.0      # Penalización por exceder capacidad (infinita si > 0)
+    late_delivery: 0.8      # Penalización por posible llegada tarde
+    long_detour: 0.3        # Penalización por desvío excesivo
+    
+vehicle:
+  # Capacidad por defecto si no se especifica
+  default_max_capacity: 6
+  # Tipos de vehículos y sus características
+  types:
+    moto:
+      speed_kmh: 30
+      capacity_override: 4
+    auto:
+      speed_kmh: 40
+      capacity_override: 8
+    camioneta:
+      speed_kmh: 35
+      capacity_override: 12
+      
+ml:
+  # Activar predicciones con ML
+  enabled: true
+  # Modelo a usar
+  model_type: random_forest
+  # Características a considerar
+  features:
+    - hour_of_day
+    - day_of_week
+    - distance
+    - current_load
+    - weather_condition
+  # Re-entrenar cada N días
+  retrain_interval_days: 7
+  
+cache:
+  # Activar cache de rutas calculadas
+  enabled: true
+  # TTL del cache (segundos)
+  ttl: 3600
+  # Tamaño máximo del cache
+  max_size: 1000
+  
+logging:
+  level: INFO
+  format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+  file: logs/ruteo.log
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
