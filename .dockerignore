@@ -1,0 +1,92 @@
+# ============================================
+# .dockerignore - Archivos excluidos del build
+# ============================================
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+.venv/
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs y cache locales (se crean en runtime)
+logs/
+*.log
+cache/
+*.cache
+
+# Tests
+test_*.py
+test_*.json
+tests/
+debug_*.py
+verify_*.py
+generate_*.py
+cliente_simple.py
+example_usage.py
+
+# Documentación
+*.md
+!README.md
+ARCHITECTURE.md
+CASO_PRUEBA_COMPLEJO.md
+COMO_CALCULAR_PERFORMANCE_SCORE.md
+EJEMPLOS_PAYLOADS.md
+EXPLICACION_PERFORMANCE_SCORE.md
+GEOCODING_ENDPOINTS.md
+INICIO_RAPIDO.md
+NUEVAS_CARACTERISTICAS.md
+OPTIMIZACIONES.md
+PROYECTO_COMPLETADO.md
+QUICKSTART.md
+RESUMEN.md
+RESUMEN_IMPLEMENTACION.md
+RESUMEN_OPTIMIZACIONES.md
+SCRIPTS_README.md
+TROUBLESHOOTING.md
+USO_ENDPOINTS.md
+
+# Scripts de desarrollo
+*.bat
+*.ps1
+start_server.py
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Temporal
+tmp/
+temp/
+*.tmp
+
+# Archivos de configuración local
+.env
+.env.local

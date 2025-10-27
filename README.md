@@ -54,7 +54,47 @@ Sistema avanzado de asignación y ruteo de pedidos con IA que resuelve el proble
 
 ## 🚀 Inicio Rápido
 
-### Opción 1: Instalación Local (Recomendado para desarrollo)
+### Opción 1: Docker 🐳 (Recomendado - Listo para Producción)
+
+La forma más fácil de ejecutar el sistema en **cualquier máquina** con un solo comando:
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/Riogas/ruteo.git
+cd ruteo
+
+# 2. Levantar con Docker Compose
+docker compose up -d
+
+# 3. ¡Listo! Verificar que funciona
+curl http://localhost:8080/health
+```
+
+**Servicios disponibles:**
+- 🌐 API: http://localhost:8080
+- 📚 Documentación: http://localhost:8080/docs
+- ✅ Health: http://localhost:8080/health
+
+**Scripts de ayuda:**
+```bash
+# Linux/Mac
+./docker-start.sh up      # Iniciar
+./docker-start.sh logs    # Ver logs
+./docker-start.sh test    # Ejecutar tests
+./docker-start.sh down    # Detener
+
+# Windows
+.\docker-start.ps1 up     # Iniciar
+.\docker-start.ps1 logs   # Ver logs
+.\docker-start.ps1 test   # Ejecutar tests
+.\docker-start.ps1 down   # Detener
+```
+
+📖 **Más información**: Ver [DOCKER.md](DOCKER.md) para configuración avanzada
+
+---
+
+### Opción 2: Instalación Local (Desarrollo)
 
 ```powershell
 # 1. Clonar o navegar al proyecto
@@ -64,19 +104,21 @@ cd ruteo
 python -m venv venv
 
 # 3. Activar entorno virtual
-.\venv\Scripts\activate
+.\venv\Scripts\activate  # Windows
+# source venv/bin/activate  # Linux/Mac
 
 # 4. Instalar dependencias
 pip install -r requirements.txt
 
 # 5. Copiar configuración de ejemplo
-copy .env.example .env
+copy .env.example .env  # Windows
+# cp .env.example .env  # Linux/Mac
 
 # 6. Ejecutar el servidor
 python app/main.py
 ```
 
-### Opción 2: Docker (Recomendado para producción)
+El servidor estará disponible en `http://localhost:8080`
 
 ```powershell
 # Construir y ejecutar con Docker Compose

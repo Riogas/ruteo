@@ -1,40 +1,118 @@
 version: '3.8'
 
+# ============================================
+# Sistema de Ruteo con Geocodificación
+# ============================================
+# Uso: docker compose up -d
+# Documentación: README.md
+# ============================================
+
 services:
+  # ========================================
   # API del sistema de ruteo
+  # ========================================
   ruteo-api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     container_name: ruteo-api
+    hostname: ruteo-api
     ports:
-      - "8000:8000"
+      - "8080:8000"  # Puerto 8080 en host, 8000 en contenedor
     environment:
-      - DEBUG=True
+      # Configuración de la aplicación
+      - DEBUG=False
       - HOST=0.0.0.0
       - PORT=8000
+      - LOG_LEVEL=INFO
+      
+      # Geocoding
       - GEOCODING_PROVIDER=nominatim
+      - NOMINATIM_USER_AGENT=ruteo-system/1.0
+      - NOMINATIM_TIMEOUT=30
+      
+      # Optimización
+      - ENABLE_CACHE=true
+      - CACHE_DIR=/app/cache
+      
+      # Zona horaria
+      - TZ=America/Montevideo
+      
+      # Redis (opcional)
+      - REDIS_URL=redis://ruteo-redis:6379/0
+      
     volumes:
+      # Persistir logs y cache
       - ./logs:/app/logs
       - ./cache:/app/cache
+      # Montar configuración (opcional)
+      - ./config:/app/config:ro
+      
+    depends_on:
+      redis:
+        condition: service_healthy
+        
     restart: unless-stopped
+    
+    networks:
+      - ruteo-network
+      
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-  
-  # Redis (opcional, para cache)
-  redis:
+      start_period: 40s
+      
+    # Límites de recursos (opcional, ajustar según necesidad)
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+  # ========================================
+  # Redis para cache (opcional pero recomendado)
+  # ========================================
+  ruteo-redis:
     image: redis:7-alpine
     container_name: ruteo-redis
+    hostname: ruteo-redis
     ports:
       - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
     restart: unless-stopped
+    networks:
+      - ruteo-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
+      interval: 10s
+      timeout: 5s
       retries: 3
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
 
+# ========================================
+# Volúmenes persistentes
+# ========================================
+volumes:
+  redis-data:
+    driver: local
+    name: ruteo-redis-data
+
+# ========================================
+# Red interna
+# ========================================
 networks:
-  default:
+  ruteo-network:
+    driver: bridge
     name: ruteo-network
