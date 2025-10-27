@@ -3,7 +3,7 @@
 # ============================================
 
 # Stage 1: Builder
-FROM python:3.11-slim as builder
+FROM python:3.11-slim AS builder
 
 # Variables de entorno para build
 ENV PYTHONUNBUFFERED=1 \
@@ -38,14 +38,14 @@ LABEL version="1.0.0"
 # Variables de entorno
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PATH=/root/.local/bin:$PATH \
+    PATH=/home/ruteo/.local/bin:$PATH \
     TZ=America/Montevideo
 
 # Instalar dependencias runtime necesarias
 RUN apt-get update && apt-get install -y \
-    libspatialindex-c6 \
-    libgeos-c1v5 \
-    libproj25 \
+    libspatialindex-dev \
+    libgeos-dev \
+    libproj-dev \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
