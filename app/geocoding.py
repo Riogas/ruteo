@@ -968,6 +968,105 @@ class GeocodingService:
             "cache_size": len(self._cache),
             "cache_enabled": self.cache_enabled
         }
+    
+    def get_streets_by_location(self, departamento: str, localidad: Optional[str] = None, timeout: int = 60) -> List[str]:
+        """
+        Obtiene listado de calles de un departamento/localidad en Uruguay usando Overpass API.
+        
+        Args:
+            departamento: Departamento de Uruguay (ej: Montevideo, Canelones)
+            localidad: Localidad específica (opcional)
+            timeout: Timeout de la consulta en segundos
+            
+        Returns:
+            Lista de nombres de calles únicas (ordenadas alfabéticamente)
+        """
+        try:
+            # Determinar URL de Overpass (usar servidor personalizado si está disponible)
+            overpass_url = os.getenv('OVERPASS_URL', 'https://overpass-api.de/api/interpreter')
+            
+            logger.info(f"🔍 Buscando calles en {departamento}" + 
+                       (f", {localidad}" if localidad else "") + ", Uruguay")
+            
+            # Paso 1: Primero geocodificar la localidad para obtener bounding box
+            if localidad:
+                search_query = f"{localidad}, {departamento}, Uruguay"
+            else:
+                search_query = f"{departamento}, Uruguay"
+            
+            logger.debug(f"   Geocodificando área: {search_query}")
+            
+            # Usar nominatim para obtener el bounding box del área
+            geocoder = self.geocoders.get(self.primary_provider)
+            if not geocoder:
+                logger.error("No hay geocodificador disponible")
+                return []
+            
+            self._respect_rate_limit()
+            location = geocoder.geocode(search_query, exactly_one=True)
+            
+            if not location or not location.raw or 'boundingbox' not in location.raw:
+                logger.error(f"No se pudo geocodificar el área: {search_query}")
+                return []
+            
+            # Obtener bounding box [south, north, west, east]
+            bbox = location.raw['boundingbox']
+            south, north, west, east = float(bbox[0]), float(bbox[1]), float(bbox[2]), float(bbox[3])
+            
+            logger.debug(f"   Bounding box: S={south}, N={north}, W={west}, E={east}")
+            
+            # Query de Overpass usando bounding box
+            query = f"""
+            [out:json][timeout:{timeout}][bbox:{south},{west},{north},{east}];
+            (
+              way["highway"]["name"];
+            );
+            out tags;
+            """
+            
+            logger.debug(f"   Consultando Overpass API...")
+            
+            response = requests.post(
+                overpass_url,
+                data=query,
+                headers={'Content-Type': 'application/x-www-form-urlencoded'},
+                timeout=timeout
+            )
+            
+            if response.status_code != 200:
+                logger.error(f"❌ Error en Overpass: HTTP {response.status_code}")
+                return []
+            
+            data = response.json()
+            elements = data.get('elements', [])
+            
+            logger.debug(f"   Overpass retornó {len(elements)} elementos")
+            
+            # Extraer nombres únicos de calles
+            street_names = set()
+            for element in elements:
+                tags = element.get('tags', {})
+                name = tags.get('name', '').strip()
+                
+                if name:
+                    street_names.add(name)
+            
+            # Convertir a lista ordenada
+            streets_list = sorted(list(street_names))
+            
+            logger.info(f"✅ Encontradas {len(streets_list)} calles únicas en {departamento}" + 
+                       (f", {localidad}" if localidad else ""))
+            
+            return streets_list
+            
+        except requests.exceptions.Timeout:
+            logger.error(f"❌ Timeout al consultar Overpass (>{timeout}s)")
+            return []
+        except Exception as e:
+            logger.error(f"❌ Error obteniendo calles: {e}")
+            import traceback
+            logger.debug(traceback.format_exc())
+            return []
 
 
 # ============================================================================

@@ -45,7 +45,9 @@ from app.models import (
     Vehicle,
     SystemConfig,
     Address,
-    Coordinates
+    Coordinates,
+    StreetsRequest,
+    StreetsResponse
 )
 from app.geocoding import get_geocoding_service
 from app.utils import lat_lon_to_utm
@@ -559,6 +561,119 @@ async def reverse_geocode_coordinates(coordinates: Coordinates) -> Address:
         raise
     except Exception as e:
         logger.error(f"❌ Error en reverse geocoding: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
+
+
+@app.post(
+    "/api/v1/streets",
+    summary="Listar calles de un departamento/localidad en Uruguay",
+    response_description="Lista de calles únicas ordenadas alfabéticamente",
+    response_model=StreetsResponse
+)
+async def get_streets(request: StreetsRequest) -> StreetsResponse:
+    """
+    Obtiene el listado completo de calles de un departamento o localidad en Uruguay.
+    
+    **Características:**
+    - País fijo: Uruguay
+    - Sin duplicados (nombres únicos)
+    - Ordenado alfabéticamente
+    - Soporta búsqueda por departamento completo o localidad específica
+    
+    ## Ejemplo 1: Todo el departamento
+    
+    ```json
+    {
+        "departamento": "Montevideo"
+    }
+    ```
+    
+    **Respuesta**: Todas las calles de Montevideo (puede tardar 30-60 segundos)
+    
+    ## Ejemplo 2: Localidad específica
+    
+    ```json
+    {
+        "departamento": "Canelones",
+        "localidad": "Ciudad de la Costa"
+    }
+    ```
+    
+    **Respuesta**: Solo calles de Ciudad de la Costa (más rápido, 10-20 segundos)
+    
+    ## Departamentos válidos de Uruguay
+    
+    - Montevideo
+    - Canelones
+    - Maldonado
+    - Colonia
+    - Rocha
+    - Salto
+    - Paysandú
+    - Rivera
+    - Tacuarembó
+    - Artigas
+    - Cerro Largo
+    - Treinta y Tres
+    - Lavalleja
+    - Durazno
+    - Flores
+    - Florida
+    - Río Negro
+    - Soriano
+    - San José
+    
+    **Nota**: La primera consulta puede tardar debido a la cantidad de datos.
+    Se recomienda usar localidades específicas para consultas más rápidas.
+    
+    Args:
+        request: Departamento y localidad opcional
+        
+    Returns:
+        Lista de calles únicas ordenadas alfabéticamente
+        
+    Raises:
+        404: No se encontraron calles para el área especificada
+        500: Error consultando la base de datos de OpenStreetMap
+        504: Timeout (consulta tomó más de 60 segundos)
+    """
+    try:
+        logger.info(f"🗺️  Listando calles: {request.departamento}" + 
+                   (f", {request.localidad}" if request.localidad else ""))
+        
+        # Obtener calles del servicio de geocodificación
+        calles = geocoding_service.get_streets_by_location(
+            departamento=request.departamento,
+            localidad=request.localidad,
+            timeout=60
+        )
+        
+        if not calles:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"No se encontraron calles para {request.departamento}" +
+                       (f", {request.localidad}" if request.localidad else "")
+            )
+        
+        response = StreetsResponse(
+            departamento=request.departamento,
+            localidad=request.localidad,
+            total_calles=len(calles),
+            calles=calles
+        )
+        
+        logger.info(f"✅ Retornando {len(calles)} calles de {request.departamento}" +
+                   (f", {request.localidad}" if request.localidad else ""))
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error listando calles: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)

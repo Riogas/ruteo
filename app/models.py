@@ -118,6 +118,53 @@ class Address(BaseModel):
     })
 
 
+class StreetsRequest(BaseModel):
+    """
+    Solicitud para listar calles de un departamento/localidad en Uruguay.
+    """
+    departamento: str = Field(..., description="Departamento de Uruguay (ej: Montevideo, Canelones, Maldonado)")
+    localidad: Optional[str] = Field(None, description="Localidad específica dentro del departamento (opcional)")
+    
+    model_config = ConfigDict(json_schema_extra={
+        "examples": [
+            {
+                "departamento": "Montevideo"
+            },
+            {
+                "departamento": "Canelones",
+                "localidad": "Ciudad de la Costa"
+            },
+            {
+                "departamento": "Maldonado",
+                "localidad": "Punta del Este"
+            }
+        ]
+    })
+
+
+class StreetsResponse(BaseModel):
+    """
+    Respuesta con listado de calles (sin duplicados).
+    """
+    departamento: str = Field(..., description="Departamento consultado")
+    localidad: Optional[str] = Field(None, description="Localidad consultada (si se especificó)")
+    total_calles: int = Field(..., description="Cantidad total de calles únicas encontradas")
+    calles: List[str] = Field(..., description="Lista de nombres de calles (ordenadas alfabéticamente)")
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "departamento": "Montevideo",
+            "localidad": None,
+            "total_calles": 3,
+            "calles": [
+                "18 de Julio",
+                "Bulevar Artigas",
+                "Rambla República de Chile"
+            ]
+        }
+    })
+
+
 # ============================================================================
 # MODELOS DE PEDIDOS
 # ============================================================================
