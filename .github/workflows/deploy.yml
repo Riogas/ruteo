@@ -1,0 +1,47 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🚀 Deploy to Production Server
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd ~/ruteo
+            git pull origin main
+            docker compose down
+            docker compose build
+            docker compose up -d
+            
+            # Esperar a que el contenedor esté listo
+            sleep 10
+            
+            # Verificar salud del servicio
+            if curl -f http://localhost:8080/health > /dev/null 2>&1; then
+              echo "✅ Deployment successful - Service is healthy"
+            else
+              echo "❌ Deployment failed - Service health check failed"
+              exit 1
+            fi
+            
+            # Limpiar imágenes viejas
+            docker image prune -f
+
+      - name: ✅ Deployment Status
+        if: success()
+        run: echo "Deployment completed successfully!"
+        
+      - name: ❌ Deployment Failed
+        if: failure()
+        run: echo "Deployment failed! Check logs above."
