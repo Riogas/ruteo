@@ -53,6 +53,9 @@ from app.models import (
     StreetsResponse,
     ZoneRequest,
     ZoneResponse,
+    DistanceCalculationRequest,
+    DistanceCalculationResponse,
+    LocationInput,
 )
 from app.geocoding import get_geocoding_service
 from app.utils import lat_lon_to_utm
@@ -951,6 +954,213 @@ async def reverse_geocode_coordinates(coordinates: Coordinates) -> Address:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
+        )
+
+
+@app.post(
+    "/api/v1/calculate-distance",
+    summary="📏 Calcular distancia y tiempo entre dos puntos",
+    response_description="Distancia y tiempo usando red vial real con flechamientos",
+    response_model=DistanceCalculationResponse,
+    tags=["routing"]
+)
+async def calculate_distance(request: DistanceCalculationRequest) -> DistanceCalculationResponse:
+    """
+    Calcula la distancia y tiempo de viaje entre dos puntos usando la red vial REAL.
+    
+    **Características:**
+    - ✅ Usa red de calles de OpenStreetMap
+    - ✅ Respeta FLECHAMIENTOS (calles de un solo sentido)
+    - ✅ Calcula ruta óptima (por tiempo o distancia)
+    - ✅ Soporta direcciones o coordenadas como entrada
+    - ✅ Tiempo estimado considerando velocidades reales
+    
+    **Entrada flexible:**
+    - Puede recibir 2 direcciones
+    - Puede recibir 2 pares de coordenadas (lat/lon)
+    - Puede mezclar: 1 dirección + 1 coordenada
+    
+    **Optimización:**
+    - `optimize_by="time"`: Busca la ruta más rápida
+    - `optimize_by="distance"`: Busca la ruta más corta
+    
+    ## Ejemplo 1: Dos direcciones
+    
+    ```json
+    {
+        "origin": {
+            "address": {
+                "street": "Av. 18 de Julio",
+                "number": "1234",
+                "city": "Montevideo",
+                "country": "Uruguay"
+            }
+        },
+        "destination": {
+            "address": {
+                "street": "Bulevar Artigas",
+                "number": "567",
+                "city": "Montevideo",
+                "country": "Uruguay"
+            }
+        },
+        "optimize_by": "time"
+    }
+    ```
+    
+    ## Ejemplo 2: Dos coordenadas
+    
+    ```json
+    {
+        "origin": {
+            "coordinates": {
+                "lat": -34.9055,
+                "lon": -56.1913
+            }
+        },
+        "destination": {
+            "coordinates": {
+                "lat": -34.8708,
+                "lon": -56.1681
+            }
+        },
+        "optimize_by": "distance",
+        "include_geometry": true
+    }
+    ```
+    
+    ## Ejemplo 3: Mixto (dirección + coordenada)
+    
+    ```json
+    {
+        "origin": {
+            "address": {
+                "street": "Av. 18 de Julio",
+                "number": "1234",
+                "city": "Montevideo",
+                "country": "Uruguay"
+            }
+        },
+        "destination": {
+            "coordinates": {
+                "lat": -34.8708,
+                "lon": -56.1681
+            }
+        },
+        "optimize_by": "time"
+    }
+    ```
+    
+    **Respuesta:**
+    - Distancia en kilómetros y metros
+    - Tiempo estimado en minutos y segundos
+    - Coordenadas de origen y destino (geocodificadas si se pasaron direcciones)
+    - Opcionalmente: geometría completa de la ruta
+    """
+    import time as time_module
+    
+    try:
+        start_time = time_module.time()
+        
+        # 1. Resolver coordenadas de origen
+        logger.info(f"📏 Calculando distancia/tiempo entre dos puntos")
+        
+        if request.origin.address:
+            logger.debug(f"  Geocodificando origen: {request.origin.address.full_address or request.origin.address.street}")
+            origin_coords = geocoding_service.geocode(request.origin.address)
+            if not origin_coords:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"No se pudo geocodificar la dirección de origen: {request.origin.address.street}"
+                )
+        else:
+            origin_coords = request.origin.coordinates
+        
+        # 2. Resolver coordenadas de destino
+        if request.destination.address:
+            logger.debug(f"  Geocodificando destino: {request.destination.address.full_address or request.destination.address.street}")
+            dest_coords = geocoding_service.geocode(request.destination.address)
+            if not dest_coords:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"No se pudo geocodificar la dirección de destino: {request.destination.address.street}"
+                )
+        else:
+            dest_coords = request.destination.coordinates
+        
+        logger.info(f"  Origen: ({origin_coords.lat:.6f}, {origin_coords.lon:.6f})")
+        logger.info(f"  Destino: ({dest_coords.lat:.6f}, {dest_coords.lon:.6f})")
+        
+        # 3. Obtener grafo de la zona
+        # Determinar ciudad para cargar el grafo (asumimos Montevideo para coordenadas en Uruguay)
+        city = "Montevideo, Uruguay"
+        if request.origin.address and request.origin.address.city:
+            city = f"{request.origin.address.city}, {request.origin.address.country}"
+        
+        logger.debug(f"  Obteniendo grafo de: {city}")
+        graph = route_calculator.get_or_create_graph(city)
+        
+        # 4. Calcular ruta
+        logger.debug(f"  Calculando ruta óptima (optimize_by={request.optimize_by})")
+        route_result = route_calculator.calculate_route(
+            graph=graph,
+            origin=origin_coords,
+            destination=dest_coords,
+            optimize_by=request.optimize_by
+        )
+        
+        if not route_result:
+            raise HTTPException(
+                status_code=404,
+                detail="No se pudo calcular una ruta entre los puntos proporcionados. Verifica que ambos puntos estén dentro de la misma red vial."
+            )
+        
+        route_nodes, distance_m, time_s = route_result
+        
+        # 5. Preparar geometría si se solicita
+        route_geometry = None
+        if request.include_geometry:
+            logger.debug(f"  Extrayendo geometría de la ruta ({len(route_nodes)} nodos)")
+            route_geometry = []
+            for node in route_nodes:
+                node_data = graph.nodes[node]
+                route_geometry.append(
+                    Coordinates(
+                        lat=node_data['y'],
+                        lon=node_data['x']
+                    )
+                )
+        
+        # 6. Calcular tiempo de procesamiento
+        calc_time_ms = (time_module.time() - start_time) * 1000
+        
+        # 7. Preparar respuesta
+        response = DistanceCalculationResponse(
+            distance_km=round(distance_m / 1000, 3),
+            distance_meters=round(distance_m, 2),
+            duration_minutes=round(time_s / 60, 2),
+            duration_seconds=round(time_s, 2),
+            origin_coordinates=origin_coords,
+            destination_coordinates=dest_coords,
+            optimized_by=request.optimize_by,
+            route_geometry=route_geometry,
+            calculation_time_ms=round(calc_time_ms, 2)
+        )
+        
+        logger.info(
+            f"✅ Ruta calculada: {response.distance_km} km, "
+            f"{response.duration_minutes} min ({calc_time_ms:.0f}ms)"
+        )
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error calculando distancia/tiempo: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al calcular distancia/tiempo: {str(e)}"
         )
 
 

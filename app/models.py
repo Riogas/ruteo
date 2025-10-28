@@ -770,6 +770,146 @@ class BatchAssignmentResponse(BaseModel):
 
 
 # ============================================================================
+# DISTANCE CALCULATION MODELS
+# ============================================================================
+
+class LocationInput(BaseModel):
+    """
+    Entrada de ubicación para cálculo de distancia.
+    Puede ser una dirección O coordenadas (no ambas).
+    """
+    address: Optional[Address] = Field(None, description="Dirección completa")
+    coordinates: Optional[Coordinates] = Field(None, description="Coordenadas geográficas")
+    
+    @validator('coordinates')
+    def validate_location_input(cls, v, values):
+        """Valida que se proporcione address O coordinates (no ambas, no ninguna)"""
+        has_address = values.get('address') is not None
+        has_coordinates = v is not None
+        
+        if not has_address and not has_coordinates:
+            raise ValueError("Debe proporcionar 'address' o 'coordinates'")
+        
+        if has_address and has_coordinates:
+            raise ValueError("Proporcione solo 'address' o 'coordinates', no ambas")
+        
+        return v
+    
+    model_config = ConfigDict(json_schema_extra={
+        "examples": [
+            {
+                "address": {
+                    "street": "Av. 18 de Julio",
+                    "number": "1234",
+                    "city": "Montevideo",
+                    "country": "Uruguay"
+                }
+            },
+            {
+                "coordinates": {
+                    "lat": -34.9011,
+                    "lon": -56.1645
+                }
+            }
+        ]
+    })
+
+
+class DistanceCalculationRequest(BaseModel):
+    """
+    Solicitud para calcular distancia y tiempo entre dos puntos.
+    Usa red vial real con flechamientos (calles de un solo sentido).
+    """
+    origin: LocationInput = Field(..., description="Punto de origen (dirección o coordenadas)")
+    destination: LocationInput = Field(..., description="Punto de destino (dirección o coordenadas)")
+    optimize_by: Literal["time", "distance"] = Field(
+        default="time",
+        description="Optimizar ruta por tiempo o distancia"
+    )
+    include_geometry: bool = Field(
+        default=False,
+        description="Incluir geometría de la ruta en la respuesta"
+    )
+    
+    model_config = ConfigDict(json_schema_extra={
+        "examples": [
+            {
+                "origin": {
+                    "address": {
+                        "street": "Av. 18 de Julio",
+                        "number": "1234",
+                        "city": "Montevideo",
+                        "country": "Uruguay"
+                    }
+                },
+                "destination": {
+                    "coordinates": {
+                        "lat": -34.9011,
+                        "lon": -56.1645
+                    }
+                },
+                "optimize_by": "time",
+                "include_geometry": False
+            },
+            {
+                "origin": {
+                    "coordinates": {
+                        "lat": -34.9055,
+                        "lon": -56.1913
+                    }
+                },
+                "destination": {
+                    "coordinates": {
+                        "lat": -34.8708,
+                        "lon": -56.1681
+                    }
+                },
+                "optimize_by": "distance",
+                "include_geometry": True
+            }
+        ]
+    })
+
+
+class DistanceCalculationResponse(BaseModel):
+    """
+    Respuesta con distancia y tiempo calculados usando red vial real.
+    """
+    distance_km: float = Field(..., description="Distancia total en kilómetros")
+    distance_meters: float = Field(..., description="Distancia total en metros")
+    duration_minutes: float = Field(..., description="Tiempo estimado en minutos")
+    duration_seconds: float = Field(..., description="Tiempo estimado en segundos")
+    origin_coordinates: Coordinates = Field(..., description="Coordenadas del origen")
+    destination_coordinates: Coordinates = Field(..., description="Coordenadas del destino")
+    optimized_by: str = Field(..., description="Criterio de optimización usado (time o distance)")
+    route_geometry: Optional[List[Coordinates]] = Field(
+        None,
+        description="Geometría de la ruta (lista de coordenadas), solo si include_geometry=true"
+    )
+    calculation_time_ms: float = Field(..., description="Tiempo de cálculo en milisegundos")
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "distance_km": 5.234,
+            "distance_meters": 5234.0,
+            "duration_minutes": 12.5,
+            "duration_seconds": 750.0,
+            "origin_coordinates": {
+                "lat": -34.9055,
+                "lon": -56.1913
+            },
+            "destination_coordinates": {
+                "lat": -34.8708,
+                "lon": -56.1681
+            },
+            "optimized_by": "time",
+            "route_geometry": None,
+            "calculation_time_ms": 245.67
+        }
+    })
+
+
+# ============================================================================
 # ACTUALIZACIÓN DE REFERENCIAS CIRCULARES
 # ============================================================================
 # Necesario para que Pydantic pueda resolver List['Order'] en Vehicle.current_orders
