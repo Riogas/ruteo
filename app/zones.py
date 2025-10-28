@@ -66,11 +66,13 @@ def _load_zones_from_file(filename: str) -> Tuple[List[Dict[str, Any]], List[Tup
             # ZONAS_4 usa 'Codigo', ZONAS_F puede usar otros campos
             zone_id = properties.get('Codigo') or properties.get('id') or properties.get('OBJECTID')
             zone_name = properties.get('name') or properties.get('nombre') or f"Zona {zone_id}"
+            zone_area = properties.get('Shape_Area', 0)
             
             zone_info = {
                 'id': str(zone_id),
                 'codigo': zone_id,  # Campo específico de Montevideo
                 'name': zone_name,
+                'area': zone_area,  # Guardamos el área para ordenar
                 'properties': properties,
                 'geometry': geometry
             }
@@ -78,7 +80,13 @@ def _load_zones_from_file(filename: str) -> Tuple[List[Dict[str, Any]], List[Tup
             zones_list.append(zone_info)
             prepared_list.append((zone_info, prepared_polygon))
         
-        logger.info(f"✅ Cargadas {len(zones_list)} zonas desde {zones_file.name}")
+        # CRÍTICO: Ordenar por área (menor a mayor) para que zonas específicas 
+        # se verifiquen primero. Esto evita que zonas grandes "capturen" puntos 
+        # que pertenecen a zonas más pequeñas y específicas
+        prepared_list.sort(key=lambda x: x[0]['area'])
+        zones_list.sort(key=lambda x: x['area'])
+        
+        logger.info(f"✅ Cargadas {len(zones_list)} zonas desde {zones_file.name} (ordenadas por área)")
         return zones_list, prepared_list
         
     except Exception as e:
@@ -195,29 +203,32 @@ def find_zones_by_coordinates(lat: float, lon: float) -> Dict[str, Optional[Dict
     point = Point(lon, lat)
     
     # 1. Buscar en zonas de flete
+    # Las zonas están ordenadas por área (menor a mayor), así que
+    # la primera zona que contenga el punto será la más específica
     for zone_info, prepared_polygon in _prepared_polygons_flete:
         try:
             if prepared_polygon.contains(point):
                 logger.info(
                     f"✅ Coordenadas ({lat}, {lon}) en Zona Flete: "
-                    f"{zone_info['name']} (Código: {zone_info['codigo']})"
+                    f"{zone_info['name']} (Código: {zone_info['codigo']}, Área: {zone_info['area']:,.0f} m²)"
                 )
                 result['flete'] = zone_info
-                break  # Solo puede estar en una zona
+                break  # Tomamos la primera (más pequeña) que contiene el punto
         except Exception as e:
             logger.error(f"❌ Error al verificar punto en zona flete {zone_info['name']}: {e}")
             continue
     
     # 2. Buscar en zonas globales
+    # Mismo principio: la primera zona (más pequeña) que contiene el punto
     for zone_info, prepared_polygon in _prepared_polygons_global:
         try:
             if prepared_polygon.contains(point):
                 logger.info(
                     f"✅ Coordenadas ({lat}, {lon}) en Zona Global: "
-                    f"{zone_info['name']} (Código: {zone_info['codigo']})"
+                    f"{zone_info['name']} (Código: {zone_info['codigo']}, Área: {zone_info['area']:,.0f} m²)"
                 )
                 result['global'] = zone_info
-                break  # Solo puede estar en una zona
+                break  # Tomamos la primera (más pequeña) que contiene el punto
         except Exception as e:
             logger.error(f"❌ Error al verificar punto en zona global {zone_info['name']}: {e}")
             continue

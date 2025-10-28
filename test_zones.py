@@ -1,12 +1,8 @@
 """
-Test del endpoint de detección de zonas.
-Prueba tanto con direcciones como con coordenadas directas.
+Análisis de áreas de las zonas de flete vs globales
 """
 
-import requests
 import json
-
-BASE_URL = "http://localhost:8080/api/v1"
 
 
 def print_separator(title: str = ""):
