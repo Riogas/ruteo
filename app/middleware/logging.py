@@ -98,27 +98,31 @@ class DetailedRequestLogger(BaseHTTPMiddleware):
         
         request_info["request_body"] = body
         
-        # Ejecutar el request y capturar response
+        # Ejecutar el request
         response = await call_next(request)
         
         # Tiempo de ejecución
         duration_ms = (time.time() - start_time) * 1000
         
-        # Capturar el body del response
+        # Capturar el body del response (necesitamos reconstruir el response)
         response_body = None
-        if isinstance(response, Response) and hasattr(response, "body"):
+        
+        # Leer el body del response iterando sobre el contenido
+        response_body_bytes = b""
+        async for chunk in response.body_iterator:
+            response_body_bytes += chunk
+        
+        # Parsear el body
+        if response_body_bytes:
             try:
-                # Leer el body del response
-                response_body_bytes = response.body
-                if response_body_bytes:
-                    response_body_str = response_body_bytes.decode('utf-8')
-                    # Truncar si es muy largo
-                    if len(response_body_str) > self.max_body_length:
-                        response_body_str = response_body_str[:self.max_body_length] + "... (truncated)"
-                    try:
-                        response_body = json.loads(response_body_str)
-                    except json.JSONDecodeError:
-                        response_body = response_body_str
+                response_body_str = response_body_bytes.decode('utf-8')
+                # Truncar si es muy largo
+                if len(response_body_str) > self.max_body_length:
+                    response_body_str = response_body_str[:self.max_body_length] + "... (truncated)"
+                try:
+                    response_body = json.loads(response_body_str)
+                except json.JSONDecodeError:
+                    response_body = response_body_str
             except Exception as e:
                 response_body = f"Error reading response: {str(e)}"
         
@@ -139,7 +143,14 @@ class DetailedRequestLogger(BaseHTTPMiddleware):
         # Escribir log en formato JSON (una línea por request)
         self.logger.info(json.dumps(log_entry, ensure_ascii=False))
         
-        return response
+        # Recrear el response con el body que leímos
+        from starlette.responses import Response as StarletteResponse
+        return StarletteResponse(
+            content=response_body_bytes,
+            status_code=response.status_code,
+            headers=dict(response.headers),
+            media_type=response.media_type
+        )
     
     def _get_client_ip(self, request: Request) -> str:
         """
