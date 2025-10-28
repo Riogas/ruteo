@@ -1276,11 +1276,21 @@ async def detect_montevideo_zones(request: DualZoneRequest) -> DualZoneResponse:
         logger.info(f"🗺️  Buscando zonas para coordenadas ({coords.lat}, {coords.lon})")
         zones_result = zones.find_zones_by_coordinates(coords.lat, coords.lon)
         
-        # 3. Construir respuesta
+        # 3. Remover campo geometry para respuesta más ligera
+        zona_flete = zones_result.get('flete')
+        zona_global = zones_result.get('global')
+        
+        if zona_flete and 'geometry' in zona_flete:
+            zona_flete = {k: v for k, v in zona_flete.items() if k != 'geometry'}
+        
+        if zona_global and 'geometry' in zona_global:
+            zona_global = {k: v for k, v in zona_global.items() if k != 'geometry'}
+        
+        # 4. Construir respuesta
         response = DualZoneResponse(
             coordinates=coords,
-            zona_flete=zones_result.get('flete'),
-            zona_global=zones_result.get('global'),
+            zona_flete=zona_flete,
+            zona_global=zona_global,
             address_provided=address_str
         )
         

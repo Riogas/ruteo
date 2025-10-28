@@ -916,6 +916,10 @@ class DistanceCalculationResponse(BaseModel):
 class ZoneInfo(BaseModel):
     """
     Información detallada de una zona.
+    
+    Nota: El campo 'geometry' se excluye en los endpoints por defecto 
+    para mantener las respuestas ligeras, ya que puede contener miles 
+    de coordenadas de polígonos.
     """
     id: str = Field(..., description="ID de la zona")
     codigo: Union[int, str, None] = Field(None, description="Código de la zona")
@@ -926,7 +930,7 @@ class ZoneInfo(BaseModel):
     )
     geometry: Optional[Dict[str, Any]] = Field(
         None,
-        description="Geometría GeoJSON de la zona"
+        description="Geometría GeoJSON de la zona (excluido por defecto)"
     )
     
     model_config = ConfigDict(json_schema_extra={
