@@ -27,7 +27,12 @@ jobs:
             sleep 15
             docker ps
             docker image prune -f
-            curl -f http://localhost:8080/health && echo "Service OK" || echo "Service starting"
+            curl -f http://localhost:8080/health && echo "✅ Service is healthy" || echo "⚠️ Service starting..."
+
+      - name: 🏥 External Health Check
+        run: |
+          echo "Verificando servicio desde internet..."
+          curl -f http://serviciosgis.riogas.uy:8080/health && echo "✅ Service accessible from internet!" || echo "⚠️ Service not accessible yet"
 
       - name: ✅ Deployment Status
         if: success()
