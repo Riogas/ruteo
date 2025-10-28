@@ -1092,13 +1092,35 @@ async def calculate_distance(request: DistanceCalculationRequest) -> DistanceCal
         logger.info(f"  Destino: ({dest_coords.lat:.6f}, {dest_coords.lon:.6f})")
         
         # 3. Obtener grafo de la zona
-        # Determinar ciudad para cargar el grafo (asumimos Montevideo para coordenadas en Uruguay)
-        city = "Montevideo, Uruguay"
-        if request.origin.address and request.origin.address.city:
-            city = f"{request.origin.address.city}, {request.origin.address.country}"
+        # Determinar el punto central y ciudad para cargar el grafo
+        # Calcular punto medio entre origen y destino para el área de búsqueda
+        center_lat = (origin_coords.lat + dest_coords.lat) / 2
+        center_lon = (origin_coords.lon + dest_coords.lon) / 2
+        center = Coordinates(lat=center_lat, lon=center_lon)
         
-        logger.debug(f"  Obteniendo grafo de: {city}")
-        graph = route_calculator.get_or_create_graph(city)
+        # Determinar ciudad/ubicación para cache
+        location_name = "Montevideo, Uruguay"
+        if request.origin.address and request.origin.address.city:
+            location_name = f"{request.origin.address.city}, {request.origin.address.country}"
+        elif request.destination.address and request.destination.address.city:
+            location_name = f"{request.destination.address.city}, {request.destination.address.country}"
+        
+        logger.debug(f"  Obteniendo grafo de: {location_name}")
+        
+        # Calcular radio necesario (distancia euclidiana + 50% margen)
+        import math
+        lat_diff = abs(origin_coords.lat - dest_coords.lat)
+        lon_diff = abs(origin_coords.lon - dest_coords.lon)
+        euclidean_dist = math.sqrt(lat_diff**2 + lon_diff**2) * 111000  # ~111km por grado
+        radius_meters = int(euclidean_dist * 1.5)  # 50% de margen
+        radius_meters = max(radius_meters, 5000)  # Mínimo 5km
+        radius_meters = min(radius_meters, 50000)  # Máximo 50km
+        
+        graph = route_calculator.get_graph_for_area(
+            center=center,
+            radius_meters=radius_meters,
+            location_name=location_name
+        )
         
         # 4. Calcular ruta
         logger.debug(f"  Calculando ruta óptima (optimize_by={request.optimize_by})")
