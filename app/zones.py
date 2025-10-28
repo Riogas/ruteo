@@ -64,13 +64,14 @@ def _load_zones_from_file(filename: str) -> Tuple[List[Dict[str, Any]], List[Tup
             
             # Extraer información de la zona
             # ZONAS_4 usa 'Codigo', ZONAS_F puede usar otros campos
-            zone_id = properties.get('Codigo') or properties.get('id') or properties.get('OBJECTID')
-            zone_name = properties.get('name') or properties.get('nombre') or f"Zona {zone_id}"
+            zone_codigo = properties.get('Codigo')
+            zone_id = properties.get('id') or properties.get('OBJECTID') or zone_codigo
+            zone_name = properties.get('name') or properties.get('nombre') or f"Zona {zone_codigo}"
             zone_area = properties.get('Shape_Area', 0)
             
             zone_info = {
                 'id': str(zone_id),
-                'codigo': zone_id,  # Campo específico de Montevideo
+                'codigo': zone_codigo,  # Campo específico de Montevideo
                 'name': zone_name,
                 'area': zone_area,  # Guardamos el área para ordenar
                 'properties': properties,
