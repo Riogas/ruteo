@@ -47,19 +47,14 @@ jobs:
             echo "=== Limpiando imágenes viejas ==="
             docker image prune -f || echo "No hay imágenes para limpiar"
             
+            echo "=== Verificando salud del servicio ==="
+            curl -f http://localhost:8080/health > /dev/null 2>&1 && echo "✅ Service is healthy" || echo "⚠️ Service not responding yet"
+            
             echo "✅ Deployment completed successfully"
-
-      - name: ⏳ Wait for service to be ready
-        run: sleep 20
-        
-      - name: 🏥 Health Check
-        run: |
-          echo "Checking service health at http://${{ secrets.SSH_HOST }}:8080/health"
-          curl -v -f http://${{ secrets.SSH_HOST }}:8080/health 2>&1 || echo "⚠️ Health check failed but deployment may have completed"
 
       - name: ✅ Deployment Status
         if: success()
-        run: echo "Deployment completed successfully!"
+        run: echo "🚀 Deployment completed successfully!"
         
       - name: ❌ Deployment Failed
         if: failure()
