@@ -165,6 +165,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Configurar logging detallado de requests
+try:
+    from app.middleware.logging import DetailedRequestLogger
+    app.add_middleware(
+        DetailedRequestLogger,
+        log_dir="/app/logs/requests",
+        max_body_length=10000
+    )
+    logger.info("✅ Middleware de logging activado")
+except ImportError as e:
+    logger.warning(f"⚠️ No se pudo cargar middleware de logging: {e}")
+
 # Montar archivos estáticos para CSS personalizado
 static_path = Path(__file__).parent / "static"
 static_path.mkdir(exist_ok=True)

@@ -41,6 +41,10 @@ fi
 
 log "🔄 Cambios detectados. Iniciando redeploy..."
 
+# Rotar logs antes del deploy
+log "📋 Rotando logs antiguos..."
+bash "$REPO_DIR/app/rotate-logs.sh"
+
 # Detener contenedores
 log "🛑 Deteniendo contenedores..."
 docker compose down
