@@ -104,16 +104,25 @@ class RouteCalculator:
         self._verify_overpass_connection()
         
         # Velocidades por defecto (km/h) según tipo de vía
+        # NOTA: Estas son velocidades REALES promedio considerando:
+        # - Semáforos y cruces (reducen ~30-40% la velocidad)
+        # - Tráfico urbano moderado
+        # - Tiempos de aceleración/desaceleración
+        # - Condiciones típicas de Montevideo
         self.default_speeds = {
-            'motorway': 80,
-            'trunk': 60,
-            'primary': 50,
-            'secondary': 40,
-            'tertiary': 30,
-            'residential': 30,
-            'service': 20,
-            'unclassified': 30,
+            'motorway': 60,      # Rambla/autopistas urbanas (antes: 80)
+            'trunk': 45,         # Vías rápidas urbanas (antes: 60)
+            'primary': 35,       # Avenidas principales con semáforos (antes: 50)
+            'secondary': 28,     # Calles importantes (antes: 40)
+            'tertiary': 25,      # Calles secundarias (antes: 30)
+            'residential': 22,   # Calles residenciales (antes: 30)
+            'service': 15,       # Calles de servicio (antes: 20)
+            'unclassified': 25,  # Calles sin clasificar (antes: 30)
         }
+        
+        # Factor de corrección urbano adicional (para casos con muchos semáforos)
+        # Se puede ajustar por ciudad: Montevideo = 0.85 (muchos semáforos)
+        self.urban_correction_factor = 0.85
         
         # OPTIMIZACIÓN: Grafo grande de Montevideo pre-cargado
         self._montevideo_graph: nx.MultiDiGraph | None = None
@@ -357,21 +366,28 @@ class RouteCalculator:
         """
         Añade tiempos de viaje a las aristas del grafo.
         
-        CÁLCULO:
-        tiempo = distancia / velocidad
+        CÁLCULO REALISTA:
+        tiempo = (distancia / velocidad) * factor_corrección_urbano
         
         La velocidad se determina por:
-        1. Velocidad máxima de la vía (si está disponible)
+        1. Velocidad máxima de la vía (si está disponible) - se reduce a realista
         2. Tipo de vía (motorway, primary, residential, etc.)
         3. Velocidad por defecto
         
-        Esto permite calcular rutas óptimas por TIEMPO, no solo distancia.
+        El factor de corrección urbano (0.85 para Montevideo) considera:
+        - Semáforos (principal factor: reducción ~20-30%)
+        - Cruces y giros
+        - Peatones y ciclistas
+        - Congestión moderada típica
+        - Tiempo de aceleración/desaceleración
+        
+        Esto permite calcular rutas con TIEMPOS REALISTAS, no ideales.
         """
         for u, v, k, data in graph.edges(keys=True, data=True):
             # Obtener longitud de la arista (metros)
             length = data.get('length', 0)
             
-            # Determinar velocidad
+            # Determinar velocidad base
             if 'maxspeed' in data:
                 try:
                     # Intentar parsear velocidad máxima
@@ -379,14 +395,19 @@ class RouteCalculator:
                     if isinstance(speed_str, list):
                         speed_str = speed_str[0]
                     speed_kmh = float(speed_str.split()[0])
+                    # Reducir velocidad máxima a velocidad realista (75% de la máxima)
+                    speed_kmh = speed_kmh * 0.75
                 except:
                     speed_kmh = self._get_speed_for_highway_type(data.get('highway'))
             else:
                 speed_kmh = self._get_speed_for_highway_type(data.get('highway'))
             
-            # Calcular tiempo de viaje (segundos)
+            # Calcular tiempo de viaje base (segundos)
             speed_ms = speed_kmh * 1000 / 3600  # km/h a m/s
-            travel_time = length / speed_ms if speed_ms > 0 else length / 10
+            travel_time_base = length / speed_ms if speed_ms > 0 else length / 10
+            
+            # Aplicar factor de corrección urbano (semáforos, cruces, etc.)
+            travel_time = travel_time_base / self.urban_correction_factor
             
             # Añadir al grafo
             data['travel_time'] = travel_time
