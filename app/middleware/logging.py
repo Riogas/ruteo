@@ -11,6 +11,7 @@ from typing import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
+from starlette.responses import StreamingResponse
 import logging
 
 
@@ -97,21 +98,36 @@ class DetailedRequestLogger(BaseHTTPMiddleware):
         
         request_info["request_body"] = body
         
-        # Ejecutar el request
+        # Ejecutar el request y capturar response
         response = await call_next(request)
         
         # Tiempo de ejecución
         duration_ms = (time.time() - start_time) * 1000
         
+        # Capturar el body del response
+        response_body = None
+        if isinstance(response, Response) and hasattr(response, "body"):
+            try:
+                # Leer el body del response
+                response_body_bytes = response.body
+                if response_body_bytes:
+                    response_body_str = response_body_bytes.decode('utf-8')
+                    # Truncar si es muy largo
+                    if len(response_body_str) > self.max_body_length:
+                        response_body_str = response_body_str[:self.max_body_length] + "... (truncated)"
+                    try:
+                        response_body = json.loads(response_body_str)
+                    except json.JSONDecodeError:
+                        response_body = response_body_str
+            except Exception as e:
+                response_body = f"Error reading response: {str(e)}"
+        
         # Información del response
         response_info = {
             "status_code": response.status_code,
             "duration_ms": round(duration_ms, 2),
+            "response_body": response_body,
         }
-        
-        # Intentar capturar el body del response (solo para JSON)
-        # Nota: No podemos leer el body aquí sin consumirlo, 
-        # así que solo registramos metadata
         
         # Log completo
         log_entry = {
