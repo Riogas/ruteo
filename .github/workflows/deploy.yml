@@ -18,39 +18,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           command_timeout: 30m
-          script_stop: false
-          debug: true
           script: |
-            set -x
-            echo "=== Iniciando deployment ==="
-            cd ~/ruteo || { echo "Error: No se pudo acceder a ~/ruteo"; exit 1; }
-            echo "=== Directorio actual: $(pwd) ==="
-            
-            echo "=== Git pull ==="
-            git pull origin main || { echo "Error en git pull"; exit 1; }
-            
-            echo "=== Docker compose down ==="
-            docker compose down || { echo "Error en compose down"; exit 1; }
-            
-            echo "=== Docker compose build (sin cache) ==="
-            docker compose build --no-cache || { echo "Error en compose build"; exit 1; }
-            
-            echo "=== Docker compose up -d ==="
-            docker compose up -d || { echo "Error en compose up"; exit 1; }
-            
-            echo "=== Esperando 15 segundos ==="
+            cd ~/ruteo
+            git pull origin main
+            docker compose down
+            docker compose build --no-cache
+            docker compose up -d
             sleep 15
-            
-            echo "=== Verificando contenedores ==="
             docker ps
-            
-            echo "=== Limpiando imágenes viejas ==="
-            docker image prune -f || echo "No hay imágenes para limpiar"
-            
-            echo "=== Verificando salud del servicio ==="
-            curl -f http://localhost:8080/health > /dev/null 2>&1 && echo "✅ Service is healthy" || echo "⚠️ Service not responding yet"
-            
-            echo "✅ Deployment completed successfully"
+            docker image prune -f
+            curl -f http://localhost:8080/health && echo "Service OK" || echo "Service starting"
 
       - name: ✅ Deployment Status
         if: success()
