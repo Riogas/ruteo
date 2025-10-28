@@ -18,25 +18,44 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           command_timeout: 30m
-          script_stop: true
+          script_stop: false
+          debug: true
           script: |
-            set -e
-            cd ~/ruteo
-            git pull origin main
-            docker compose down
-            docker compose build --no-cache
-            docker compose up -d
+            set -x
+            echo "=== Iniciando deployment ==="
+            cd ~/ruteo || { echo "Error: No se pudo acceder a ~/ruteo"; exit 1; }
+            echo "=== Directorio actual: $(pwd) ==="
+            
+            echo "=== Git pull ==="
+            git pull origin main || { echo "Error en git pull"; exit 1; }
+            
+            echo "=== Docker compose down ==="
+            docker compose down || { echo "Error en compose down"; exit 1; }
+            
+            echo "=== Docker compose build (sin cache) ==="
+            docker compose build --no-cache || { echo "Error en compose build"; exit 1; }
+            
+            echo "=== Docker compose up -d ==="
+            docker compose up -d || { echo "Error en compose up"; exit 1; }
+            
+            echo "=== Esperando 15 segundos ==="
             sleep 15
-            docker image prune -f || true
-            echo "✅ Deployment completed"
+            
+            echo "=== Verificando contenedores ==="
+            docker ps
+            
+            echo "=== Limpiando imágenes viejas ==="
+            docker image prune -f || echo "No hay imágenes para limpiar"
+            
+            echo "✅ Deployment completed successfully"
 
       - name: ⏳ Wait for service to be ready
         run: sleep 20
         
       - name: 🏥 Health Check
         run: |
-          echo "Checking service health..."
-          curl -f http://${{ secrets.SSH_HOST }}:8080/health || echo "⚠️ Health check failed but deployment completed"
+          echo "Checking service health at http://${{ secrets.SSH_HOST }}:8080/health"
+          curl -v -f http://${{ secrets.SSH_HOST }}:8080/health 2>&1 || echo "⚠️ Health check failed but deployment may have completed"
 
       - name: ✅ Deployment Status
         if: success()
