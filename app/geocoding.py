@@ -460,19 +460,17 @@ class GeocodingService:
                 return coords
         
         # CASO 2: Calle principal + Número de puerta (más específico)
-        # Ejemplo: "18 de Julio 1234" → Geocodificar directamente
+        # Ejemplo: street="18 de Julio" + number="1234" → "18 de Julio 1234"
         if address.street:
-            # Verificar si la calle ya incluye un número
-            has_number = any(char.isdigit() for char in address.street.split()[-1])
-            
-            if has_number:
-                # Ya tiene número en la calle
-                cache_key = f"{address.street}, {address.city}, {address.country}"
+            # Construir la dirección completa con el número si existe
+            if address.number:
+                street_with_number = f"{address.street} {address.number}"
+                cache_key = f"{street_with_number}, {address.city}, {address.country}"
                 cached = self._check_cache(cache_key)
                 if cached:
                     return cached
                 
-                logger.info(f"🔍 Geocodificando calle con número: {address.street}")
+                logger.info(f"🔍 Geocodificando calle con número: {street_with_number}")
                 coords = self._geocode_with_provider(cache_key, self.primary_provider)
                 if coords:
                     self._save_to_cache(cache_key, coords)
@@ -824,11 +822,11 @@ class GeocodingService:
             raw = location.raw
             address_data = raw.get('address', {})
             
-            # Extraer calle y número de puerta
+            # Extraer calle y número de puerta separados
             street = address_data.get('road', '')
             house_number = address_data.get('house_number', '')
             
-            # Si hay número de puerta, incluirlo en la calle
+            # Construir street_with_number solo para logging/full_address
             if house_number and street:
                 street_with_number = f"{street} {house_number}"
             else:
@@ -903,9 +901,10 @@ class GeocodingService:
                 except Exception as e:
                     logger.debug(f"   ⚠️  Fallback Nominatim también falló: {e}")
             
-            # Construir Address con todos los datos
+            # Construir Address con todos los datos (número separado)
             address = Address(
-                street=street_with_number,
+                street=street,  # Sin número
+                number=house_number if house_number else None,  # Número separado
                 city=address_data.get('city') or address_data.get('town', ''),
                 state=address_data.get('state', ''),
                 country=address_data.get('country', ''),
@@ -1124,7 +1123,8 @@ if __name__ == "__main__":
     
     # Ejemplo 1: Geocodificar dirección estructurada
     address = Address(
-        street="Av. Corrientes 1234",
+        street="Av. Corrientes",
+        number="1234",
         city="Buenos Aires",
         country="Argentina"
     )
@@ -1143,8 +1143,8 @@ if __name__ == "__main__":
     
     # Ejemplo 3: Batch geocoding
     addresses = [
-        Address(street="Av. 9 de Julio 1000", city="Buenos Aires", country="Argentina"),
-        Address(street="Calle Florida 500", city="Buenos Aires", country="Argentina"),
+        Address(street="Av. 9 de Julio", number="1000", city="Buenos Aires", country="Argentina"),
+        Address(street="Calle Florida", number="500", city="Buenos Aires", country="Argentina"),
     ]
     
     results = service.batch_geocode(addresses)

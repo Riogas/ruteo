@@ -23,10 +23,13 @@ import os
 import sys
 from datetime import datetime
 from typing import List, Optional
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.openapi.docs import get_swagger_ui_html
 from loguru import logger
 from dotenv import load_dotenv
 
@@ -47,13 +50,16 @@ from app.models import (
     Address,
     Coordinates,
     StreetsRequest,
-    StreetsResponse
+    StreetsResponse,
+    ZoneRequest,
+    ZoneResponse,
 )
 from app.geocoding import get_geocoding_service
 from app.utils import lat_lon_to_utm
 from app.routing import RouteCalculator
 from app.scoring import ScoringEngine
 from app.optimizer import RouteOptimizer, ClusteringOptimizer
+from app import zones
 
 
 # ============================================================================
@@ -78,29 +84,76 @@ logger.add(
 app = FastAPI(
     title="Sistema de Ruteo Inteligente",
     description="""
-    API REST para asignación inteligente de pedidos a vehículos.
+    🚚 **API REST avanzada** para asignación inteligente de pedidos a vehículos
     
-    ## Características
+    ## ✨ Características principales
     
-    * **Geocodificación bidireccional**: Dirección ↔ Coordenadas
-    * **Ruteo avanzado**: Usa red vial real con calles flechadas
-    * **Scoring multi-criterio**: Evalúa múltiples factores
-    * **Optimización con IA**: Algoritmos avanzados (OR-Tools)
-    * **Capacidad dinámica**: Configurable por vehículo
-    * **Priorización temporal**: Respeta deadlines
-    * **Modo batch ultra-rápido**: Optimizado para procesar múltiples pedidos
+    * 🗺️ **Geocodificación bidireccional**: Convierte direcciones en coordenadas y viceversa
+    * 🧭 **Ruteo avanzado**: Usa red vial real con calles flechadas
+    * 📊 **Scoring multi-criterio**: Evalúa múltiples factores para asignación óptima
+    * 🤖 **Optimización con IA**: Algoritmos avanzados (OR-Tools)
+    * ⚡ **Capacidad dinámica**: Configurable por vehículo
+    * ⏰ **Priorización temporal**: Respeta deadlines
+    * 🔄 **Modo batch ultra-rápido**: Optimizado para procesar múltiples pedidos
+    * 🌍 **Coordenadas UTM**: Soporte para proyección UTM Zone 21S (Uruguay)
+    * 🏘️ **Detección de zonas**: Point-in-polygon con GeoJSON
+    * 🛣️ **Consulta de calles**: Lista calles por departamento y localidad
     
-    ## Flujo típico
+    ## 🎯 Flujo típico
     
     1. Cliente ingresa dirección
     2. Sistema geocodifica la dirección
     3. Se evalúan todos los vehículos disponibles
     4. Se asigna al vehículo óptimo
     5. Se optimiza la secuencia de entregas
+    
+    ## 🔧 Stack tecnológico
+    
+    - **FastAPI** + **Pydantic** para validación de datos
+    - **OSMnx** + **NetworkX** para análisis de redes viales
+    - **OR-Tools** para optimización matemática
+    - **Redis** para caché de rutas
+    - **Shapely** + **PyProj** para operaciones geoespaciales
+    - **Nominatim** + **Overpass API** para geocodificación
+    
+    ## 📚 Documentación adicional
+    
+    - [Repositorio GitHub](https://github.com/Riogas/ruteo)
+    - [Ejemplos Docker](https://github.com/Riogas/ruteo/blob/main/DOCKER_EJEMPLOS.md)
     """,
     version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
+    docs_url=None,  # Deshabilitamos el docs por defecto para usar el personalizado
+    redoc_url="/redoc",
+    openapi_tags=[
+        {
+            "name": "info",
+            "description": "🏠 Información general del sistema"
+        },
+        {
+            "name": "routing",
+            "description": "🚗 Asignación y optimización de rutas"
+        },
+        {
+            "name": "geocoding",
+            "description": "📍 Conversión entre direcciones y coordenadas"
+        },
+        {
+            "name": "streets",
+            "description": "🛣️ Consulta de calles por ubicación"
+        },
+        {
+            "name": "zones",
+            "description": "🗺️ Detección de zonas geográficas"
+        }
+    ],
+    contact={
+        "name": "Sistema de Ruteo Inteligente",
+        "url": "https://github.com/Riogas/ruteo",
+    },
+    license_info={
+        "name": "MIT License",
+        "url": "https://opensource.org/licenses/MIT",
+    }
 )
 
 # Configurar CORS
@@ -111,6 +164,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Montar archivos estáticos para CSS personalizado
+static_path = Path(__file__).parent / "static"
+static_path.mkdir(exist_ok=True)
+app.mount("/static", StaticFiles(directory=str(static_path)), name="static")
 
 
 # ============================================================================
@@ -145,6 +203,9 @@ async def startup_event():
         
         geocoding_service = get_geocoding_service()
         route_calculator = RouteCalculator()
+        
+        # Cargar zonas desde GeoJSON
+        zones.load_zones()
         
         # OPTIMIZACIÓN: Pre-cargar grafo grande de Montevideo (DESACTIVADO)
         # Descomentar las siguientes líneas para activar (toma 20-30s al inicio)
@@ -183,13 +244,318 @@ async def shutdown_event():
 # ENDPOINTS
 # ============================================================================
 
+@app.get("/docs", include_in_schema=False)
+async def custom_swagger_ui_html():
+    """Documentación Swagger UI con diseño inspirado en ReDoc"""
+    return HTMLResponse(content=f"""
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{app.title} - API Documentation</title>
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+        <link rel="icon" type="image/png" href="https://fastapi.tiangolo.com/img/favicon.png">
+        <link rel="stylesheet" type="text/css" href="/static/swagger-custom.css">
+        <style>
+            /* Sidebar Navigation */
+            .sidebar-nav {{
+                position: fixed;
+                left: 0;
+                top: 0;
+                width: 260px;
+                height: 100vh;
+                background: #ffffff;
+                border-right: 1px solid #e5e5e5;
+                overflow-y: auto;
+                z-index: 1000;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            }}
+            
+            .sidebar-header {{
+                padding: 24px 20px;
+                border-bottom: 1px solid #e5e5e5;
+            }}
+            
+            .sidebar-header h2 {{
+                margin: 0;
+                font-size: 18px;
+                font-weight: 700;
+                color: #32329f;
+                letter-spacing: -0.3px;
+            }}
+            
+            .sidebar-header p {{
+                margin: 6px 0 0 0;
+                font-size: 12px;
+                color: #999999;
+            }}
+            
+            .sidebar-nav-list {{
+                padding: 16px 0;
+            }}
+            
+            .sidebar-nav h3 {{
+                color: #999999;
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                padding: 0 20px;
+                margin: 20px 0 8px 0;
+            }}
+            
+            .sidebar-nav a {{
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 10px 20px;
+                color: #666666;
+                text-decoration: none;
+                font-size: 13px;
+                font-weight: 500;
+                transition: all 0.15s ease;
+                border-left: 3px solid transparent;
+            }}
+            
+            .sidebar-nav a:hover {{
+                background: rgba(50, 50, 159, 0.05);
+                color: #32329f;
+            }}
+            
+            .sidebar-nav a.active {{
+                background: rgba(50, 50, 159, 0.08);
+                color: #32329f;
+                border-left-color: #32329f;
+                font-weight: 600;
+            }}
+            
+            .sidebar-nav .emoji {{
+                font-size: 16px;
+                width: 20px;
+                text-align: center;
+            }}
+            
+            .sidebar-nav .divider {{
+                height: 1px;
+                background: #e5e5e5;
+                margin: 16px 20px;
+            }}
+            
+            .sidebar-footer {{
+                padding: 16px 20px;
+                border-top: 1px solid #e5e5e5;
+                margin-top: auto;
+            }}
+            
+            .sidebar-footer a {{
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                color: #999999;
+                text-decoration: none;
+                font-size: 12px;
+                padding: 6px 0;
+            }}
+            
+            .sidebar-footer a:hover {{
+                color: #32329f;
+            }}
+        </style>
+    </head>
+    <body>
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar-nav">
+            <div class="sidebar-header">
+                <h2>� Ruteo Inteligente</h2>
+                <p>API v{app.version}</p>
+            </div>
+            
+            <div class="sidebar-nav-list">
+                <h3>Endpoints</h3>
+                <a href="#tag-info" data-tag="info">
+                    <span class="emoji">🏠</span>
+                    <span>Información</span>
+                </a>
+                <a href="#tag-routing" data-tag="routing">
+                    <span class="emoji">🚗</span>
+                    <span>Routing</span>
+                </a>
+                <a href="#tag-geocoding" data-tag="geocoding">
+                    <span class="emoji">📍</span>
+                    <span>Geocoding</span>
+                </a>
+                <a href="#tag-streets" data-tag="streets">
+                    <span class="emoji">🛣️</span>
+                    <span>Streets</span>
+                </a>
+                <a href="#tag-zones" data-tag="zones">
+                    <span class="emoji">🗺️</span>
+                    <span>Zones</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <a href="/redoc" target="_blank">
+                    <span>📖</span>
+                    <span>Ver en ReDoc</span>
+                </a>
+                <a href="/openapi.json" target="_blank">
+                    <span>🔗</span>
+                    <span>OpenAPI JSON</span>
+                </a>
+                <a href="https://github.com/Riogas/ruteo" target="_blank">
+                    <span>💻</span>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </nav>
+        
+        <!-- Swagger UI -->
+        <div id="swagger-ui"></div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+        <script>
+            window.onload = () => {{
+                // Initialize Swagger UI
+                window.ui = SwaggerUIBundle({{
+                    url: '{app.openapi_url}',
+                    dom_id: '#swagger-ui',
+                    deepLinking: true,
+                    presets: [
+                        SwaggerUIBundle.presets.apis,
+                        SwaggerUIStandalonePreset
+                    ],
+                    plugins: [
+                        SwaggerUIBundle.plugins.DownloadUrl
+                    ],
+                    layout: "BaseLayout",
+                    syntaxHighlight: {{
+                        activated: true,
+                        theme: "monokai"
+                    }},
+                    defaultModelsExpandDepth: 1,
+                    defaultModelExpandDepth: 1,
+                    docExpansion: "list",
+                    filter: false,
+                    displayRequestDuration: true,
+                    tryItOutEnabled: true,
+                    persistAuthorization: true,
+                    showCommonExtensions: true,
+                    showExtensions: true
+                }});
+                
+                // Wait for Swagger UI to render completely
+                setTimeout(() => {{
+                    initializeSidebarNavigation();
+                }}, 1500);
+            }};
+            
+            function initializeSidebarNavigation() {{
+                const sidebarLinks = document.querySelectorAll('.sidebar-nav a[data-tag]');
+                
+                // Smooth scroll to sections
+                sidebarLinks.forEach(link => {{
+                    link.addEventListener('click', (e) => {{
+                        e.preventDefault();
+                        const tag = link.getAttribute('data-tag');
+                        
+                        // Try different possible selectors for the tag section
+                        let targetElement = document.getElementById('operations-tag-' + tag) ||
+                                          document.getElementById('tag-' + tag) ||
+                                          document.querySelector(`[data-tag="${{tag}}"]`) ||
+                                          document.querySelector(`#operations-${{tag}}`);
+                        
+                        // If still not found, try finding by text content
+                        if (!targetElement) {{
+                            const allTags = document.querySelectorAll('.opblock-tag');
+                            for (let tagElement of allTags) {{
+                                const tagText = tagElement.textContent.toLowerCase();
+                                if (tagText.includes(tag.toLowerCase())) {{
+                                    targetElement = tagElement.closest('.opblock-tag-section') || tagElement;
+                                    break;
+                                }}
+                            }}
+                        }}
+                        
+                        if (targetElement) {{
+                            // Scroll with offset
+                            const y = targetElement.getBoundingClientRect().top + window.pageYOffset - 20;
+                            window.scrollTo({{ top: y, behavior: 'smooth' }});
+                            
+                            // Update active state
+                            sidebarLinks.forEach(l => l.classList.remove('active'));
+                            link.classList.add('active');
+                            
+                            console.log('Navigated to:', tag, targetElement);
+                        }} else {{
+                            console.warn('Could not find section for tag:', tag);
+                        }}
+                    }});
+                }});
+                
+                // Update active link on scroll with debounce
+                let scrollTimeout;
+                window.addEventListener('scroll', () => {{
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {{
+                        updateActiveLink();
+                    }}, 100);
+                }});
+                
+                // Initial active link
+                updateActiveLink();
+                
+                function updateActiveLink() {{
+                    const sections = document.querySelectorAll('.opblock-tag-section');
+                    let currentSection = '';
+                    
+                    sections.forEach(section => {{
+                        const rect = section.getBoundingClientRect();
+                        if (rect.top <= 150 && rect.bottom >= 150) {{
+                            // Try to find the tag name from the section
+                            const tagElement = section.querySelector('.opblock-tag span');
+                            if (tagElement) {{
+                                const tagText = tagElement.textContent.toLowerCase();
+                                // Map tag text to data-tag values
+                                if (tagText.includes('información') || tagText.includes('info')) currentSection = 'info';
+                                else if (tagText.includes('routing')) currentSection = 'routing';
+                                else if (tagText.includes('geocoding')) currentSection = 'geocoding';
+                                else if (tagText.includes('streets')) currentSection = 'streets';
+                                else if (tagText.includes('zones')) currentSection = 'zones';
+                            }}
+                        }}
+                    }});
+                    
+                    if (currentSection) {{
+                        sidebarLinks.forEach(link => {{
+                            link.classList.remove('active');
+                            if (link.getAttribute('data-tag') === currentSection) {{
+                                link.classList.add('active');
+                            }}
+                        }});
+                    }}
+                }}
+            }}
+        </script>
+    </body>
+    </html>
+    """, status_code=200)
+
+
 @app.get(
     "/",
-    summary="Root endpoint",
-    response_description="Información básica de la API"
+    summary="🏠 Root endpoint",
+    response_description="Información básica de la API",
+    tags=["info"]
 )
 async def root():
-    """Endpoint raíz con información de la API"""
+    """
+    Endpoint raíz con información básica de la API.
+    
+    Retorna el nombre, versión y links a la documentación.
+    """
     return {
         "name": "Sistema de Ruteo Inteligente",
         "version": "1.0.0",
@@ -202,12 +568,15 @@ async def root():
 @app.get(
     "/health",
     response_model=HealthCheckResponse,
-    summary="Health check",
-    response_description="Estado de salud de la API"
+    summary="🏥 Health check",
+    response_description="Estado de salud de la API",
+    tags=["info"]
 )
 async def health_check():
     """
     Verifica el estado de salud de la API y sus servicios.
+    
+    Retorna el estado actual del sistema y timestamp.
     
     Returns:
         Estado de la API y sus componentes
@@ -222,9 +591,10 @@ async def health_check():
 @app.post(
     "/api/v1/assign-order",
     response_model=AssignmentResult,
-    summary="Asignar pedido a vehículo",
+    summary="🚗 Asignar pedido a vehículo",
     response_description="Resultado de la asignación con vehículo óptimo",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    tags=["routing"]
 )
 async def assign_order(request: AssignmentRequest) -> AssignmentResult:
     """
@@ -253,7 +623,7 @@ async def assign_order(request: AssignmentRequest) -> AssignmentResult:
     {
         "order": {
             "id": "PED-001",
-            "address": {"street": "Av. Corrientes 1234", "city": "Buenos Aires"},
+            "address": {"street": "Av. Corrientes", "number": "1234", "city": "Buenos Aires"},
             "deadline": "2025-10-22T18:00:00",
             "priority": "high"
         },
@@ -385,8 +755,9 @@ async def assign_order(request: AssignmentRequest) -> AssignmentResult:
 
 @app.post(
     "/api/v1/geocode",
-    summary="Geocodificar dirección (soporta esquinas)",
-    response_description="Coordenadas de la dirección"
+    summary="📍 Geocodificar dirección (soporta esquinas)",
+    response_description="Coordenadas de la dirección",
+    tags=["geocoding"]
 )
 async def geocode_address(address: Address) -> Coordinates:
     """
@@ -398,7 +769,8 @@ async def geocode_address(address: Address) -> Coordinates:
     
     ```json
     {
-        "street": "Av. 18 de Julio 1234",
+        "street": "Av. 18 de Julio",
+        "number": "1234",
         "city": "Montevideo",
         "country": "Uruguay"
     }
@@ -420,7 +792,8 @@ async def geocode_address(address: Address) -> Coordinates:
     
     ```json
     {
-        "street": "Av. 18 de Julio 1234",
+        "street": "Av. 18 de Julio",
+        "number": "1234",
         "corner_1": "Ejido",
         "city": "Montevideo",
         "country": "Uruguay"
@@ -475,8 +848,9 @@ async def geocode_address(address: Address) -> Coordinates:
 
 @app.post(
     "/api/v1/reverse-geocode",
-    summary="Geocodificación inversa (coordenadas → dirección + esquinas)",
-    response_description="Dirección correspondiente a las coordenadas con esquinas"
+    summary="🔄 Geocodificación inversa (coordenadas → dirección + esquinas)",
+    response_description="Dirección correspondiente a las coordenadas con esquinas",
+    tags=["geocoding"]
 )
 async def reverse_geocode_coordinates(coordinates: Coordinates) -> Address:
     """
@@ -502,7 +876,8 @@ async def reverse_geocode_coordinates(coordinates: Coordinates) -> Address:
     
     ```json
     {
-        "street": "18 de Julio 1234",
+        "street": "18 de Julio",
+        "number": "1234",
         "city": "Montevideo",
         "state": "Montevideo",
         "country": "Uruguay",
@@ -568,10 +943,121 @@ async def reverse_geocode_coordinates(coordinates: Coordinates) -> Address:
 
 
 @app.post(
+    "/api/v1/zone",
+    summary="🗺️ Detectar zona de una dirección o coordenadas",
+    response_description="Información de la zona (si existe) donde se encuentra el punto",
+    response_model=ZoneResponse,
+    tags=["zones"]
+)
+async def detect_zone(request: ZoneRequest) -> ZoneResponse:
+    """
+    Determina en qué zona se encuentra una dirección o coordenadas.
+    
+    **Opciones de entrada:**
+    1. Proporcionar dirección completa (se geocodificará automáticamente)
+    2. Proporcionar coordenadas lat/lon directamente
+    
+    **Zonas disponibles:**
+    - Salto
+    - Termas del Daymán
+    - Arenitas Blancas
+    
+    ## Ejemplo 1: Usando dirección
+    
+    ```json
+    {
+        "address": "18 de Julio 1234, Salto"
+    }
+    ```
+    
+    ## Ejemplo 2: Usando coordenadas
+    
+    ```json
+    {
+        "lat": -31.3820,
+        "lon": -57.9640
+    }
+    ```
+    
+    **Respuesta:**
+    - Si el punto está dentro de una zona: devuelve información completa de la zona
+    - Si el punto NO está en ninguna zona: devuelve zone_found=false
+    - Siempre incluye coordenadas con UTM del punto consultado
+    
+    **Departamentos de Uruguay:**
+    Artigas, Canelones, Cerro Largo, Colonia, Durazno, Flores, Florida, 
+    Lavalleja, Maldonado, Montevideo, Paysandú, Río Negro, Rivera, Rocha, 
+    Salto, San José, Soriano, Tacuarembó, Treinta y Tres
+    """
+    try:
+        # Determinar coordenadas según entrada
+        if request.address:
+            # Geocodificar dirección
+            logger.info(f"Detectando zona para dirección: {request.address}")
+            coords = geocoding_service.geocode(request.address)
+            if not coords:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"No se pudo geocodificar la dirección: {request.address}"
+                )
+            lat, lon = coords.lat, coords.lon
+        else:
+            # Usar coordenadas directas
+            lat, lon = request.lat, request.lon
+            logger.info(f"Detectando zona para coordenadas: ({lat}, {lon})")
+            
+            # Enriquecer con UTM
+            try:
+                utm_x, utm_y, utm_zone = lat_lon_to_utm(lat, lon)
+                coords = Coordinates(
+                    lat=lat,
+                    lon=lon,
+                    utm_x=utm_x,
+                    utm_y=utm_y,
+                    utm_zone=utm_zone
+                )
+            except Exception as e:
+                logger.warning(f"No se pudo calcular UTM: {e}")
+                coords = Coordinates(lat=lat, lon=lon)
+        
+        # Buscar zona usando point-in-polygon
+        zone_info = zones.find_zone_by_coordinates(lat, lon)
+        
+        if zone_info:
+            # Punto está dentro de una zona
+            return ZoneResponse(
+                coordinates=coords,
+                zone_found=True,
+                zone_id=zone_info['id'],
+                zone_name=zone_info['name'],
+                zone_properties=zone_info['properties']
+            )
+        else:
+            # Punto no está en ninguna zona
+            return ZoneResponse(
+                coordinates=coords,
+                zone_found=False,
+                zone_id=None,
+                zone_name=None,
+                zone_properties=None
+            )
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error en detección de zona: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error al detectar zona: {str(e)}"
+        )
+
+
+@app.post(
     "/api/v1/streets",
-    summary="Listar calles de un departamento/localidad en Uruguay",
+    summary="🛣️ Listar calles de un departamento/localidad en Uruguay",
     response_description="Lista de calles únicas ordenadas alfabéticamente",
-    response_model=StreetsResponse
+    response_model=StreetsResponse,
+    tags=["streets"]
 )
 async def get_streets(request: StreetsRequest) -> StreetsResponse:
     """
@@ -682,8 +1168,9 @@ async def get_streets(request: StreetsRequest) -> StreetsResponse:
 
 @app.get(
     "/api/v1/stats",
-    summary="Estadísticas del sistema",
-    response_description="Estadísticas de uso"
+    summary="📊 Estadísticas del sistema",
+    response_description="Estadísticas de uso",
+    tags=["info"]
 )
 async def get_stats():
     """
@@ -744,9 +1231,10 @@ async def general_exception_handler(request, exc):
 @app.post(
     "/api/v1/assign-orders-batch",
     response_model=BatchAssignmentResponse,
-    summary="Asignar múltiples pedidos a vehículos (Batch)",
+    summary="🔄 Asignar múltiples pedidos a vehículos (Batch)",
     response_description="Resultados de asignación de todos los pedidos",
-    status_code=status.HTTP_200_OK
+    status_code=status.HTTP_200_OK,
+    tags=["routing"]
 )
 async def assign_orders_batch(request: BatchAssignmentRequest) -> BatchAssignmentResponse:
     """

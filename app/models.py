@@ -9,7 +9,7 @@ Define todas las estructuras de datos usando Pydantic para:
 """
 
 from datetime import datetime
-from typing import Optional, List, Dict, Literal
+from typing import Optional, List, Dict, Literal, Any
 from enum import Enum
 from pydantic import BaseModel, Field, validator, ConfigDict
 
@@ -81,11 +81,12 @@ class Address(BaseModel):
     Dirección completa con información estructurada.
     
     Soporta múltiples formatos de direcciones:
-    - Con número de puerta: "Av. 18 de Julio 1234"
-    - Con esquinas: "Av. 18 de Julio entre Río Negro y Ejido"
-    - Combinado: "Av. 18 de Julio 1234 esquina Ejido"
+    - Con número de puerta: "Av. 18 de Julio" + number: "1234"
+    - Con esquinas: "Av. 18 de Julio" con corner_1 y corner_2
+    - Combinado: "Av. 18 de Julio" + number: "1234" + corner_1: "Ejido"
     """
-    street: str = Field(..., description="Calle principal (con o sin número)")
+    street: str = Field(..., description="Calle principal (sin número de puerta)")
+    number: Optional[str] = Field(None, description="Número de puerta")
     city: str = Field(..., description="Ciudad")
     state: Optional[str] = Field(None, description="Provincia/Estado/Departamento")
     country: str = Field(default="Uruguay", description="País")
@@ -101,7 +102,8 @@ class Address(BaseModel):
     model_config = ConfigDict(json_schema_extra={
         "examples": [
             {
-                "street": "Av. 18 de Julio 1234",
+                "street": "Av. 18 de Julio",
+                "number": "1234",
                 "city": "Montevideo",
                 "country": "Uruguay",
                 "full_address": "Av. 18 de Julio 1234, Montevideo, Uruguay"
@@ -113,6 +115,125 @@ class Address(BaseModel):
                 "city": "Montevideo",
                 "country": "Uruguay",
                 "full_address": "Av. 18 de Julio entre Río Negro y Ejido, Montevideo"
+            },
+            {
+                "street": "Av. 18 de Julio",
+                "number": "1234",
+                "corner_1": "Ejido",
+                "city": "Montevideo",
+                "country": "Uruguay",
+                "full_address": "Av. 18 de Julio 1234 esquina Ejido, Montevideo"
+            }
+        ]
+    })
+
+
+# ============================================
+# MODELOS DE ZONAS (Zones)
+# ============================================
+
+
+class ZoneRequest(BaseModel):
+    """
+    Solicitud para determinar la zona de una dirección o coordenadas.
+    
+    Debe proporcionar EXACTAMENTE UNA de las siguientes opciones:
+    - address: Dirección completa (será geocodificada)
+    - lat + lon: Coordenadas geográficas directas
+    """
+    address: Optional[str] = Field(
+        None,
+        description="Dirección completa a geocodificar (ej: '18 de Julio 1234, Montevideo')"
+    )
+    lat: Optional[float] = Field(
+        None,
+        ge=-90,
+        le=90,
+        description="Latitud del punto"
+    )
+    lon: Optional[float] = Field(
+        None,
+        ge=-180,
+        le=180,
+        description="Longitud del punto"
+    )
+    
+    model_config = ConfigDict(json_schema_extra={
+        "examples": [
+            {
+                "address": "18 de Julio 1234, Salto"
+            },
+            {
+                "lat": -31.3820,
+                "lon": -57.9640
+            }
+        ]
+    })
+    
+    @validator('lon')
+    def validate_inputs(cls, v, values):
+        """Valida que solo se use address O coordenadas (lat+lon), no ambos"""
+        has_address = values.get('address') is not None
+        has_lat = values.get('lat') is not None
+        has_lon = v is not None
+        
+        # Debe tener address O ambas coordenadas
+        if has_address and (has_lat or has_lon):
+            raise ValueError("Proporcione 'address' O coordenadas (lat, lon), no ambos")
+        
+        # Si tiene una coordenada, debe tener ambas
+        if (has_lat and not has_lon) or (has_lon and not has_lat):
+            raise ValueError("Si proporciona coordenadas, debe incluir tanto 'lat' como 'lon'")
+        
+        # Debe tener al menos una opción
+        if not has_address and not (has_lat and has_lon):
+            raise ValueError("Debe proporcionar 'address' O coordenadas (lat, lon)")
+        
+        return v
+
+
+class ZoneResponse(BaseModel):
+    """
+    Respuesta con información de la zona encontrada.
+    """
+    coordinates: Coordinates = Field(
+        ...,
+        description="Coordenadas del punto consultado (con UTM)"
+    )
+    zone_found: bool = Field(
+        ...,
+        description="Indica si el punto está dentro de alguna zona"
+    )
+    zone_id: Optional[str] = Field(
+        None,
+        description="ID único de la zona"
+    )
+    zone_name: Optional[str] = Field(
+        None,
+        description="Nombre de la zona"
+    )
+    zone_properties: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Propiedades adicionales de la zona"
+    )
+    
+    model_config = ConfigDict(json_schema_extra={
+        "examples": [
+            {
+                "coordinates": {
+                    "lat": -31.3820,
+                    "lon": -57.9640,
+                    "utm_x": 426543.21,
+                    "utm_y": 6524123.45,
+                    "utm_zone": "21S"
+                },
+                "zone_found": True,
+                "zone_id": "313943121",
+                "zone_name": "Salto",
+                "zone_properties": {
+                    "id": "313943121",
+                    "name": "Salto"
+                }
             }
         ]
     })

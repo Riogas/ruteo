@@ -1,0 +1,59 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "zona-salto-centro",
+        "name": "Salto Centro",
+        "descripcion": "Zona del centro de Salto"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-57.9720, -31.3750],
+          [-57.9720, -31.3950],
+          [-57.9500, -31.3950],
+          [-57.9500, -31.3750],
+          [-57.9720, -31.3750]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "zona-termas-dayman",
+        "name": "Termas del Daymán",
+        "descripcion": "Zona de Termas del Daymán"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-57.9400, -31.4350],
+          [-57.9400, -31.4550],
+          [-57.9200, -31.4550],
+          [-57.9200, -31.4350],
+          [-57.9400, -31.4350]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "zona-arenitas-blancas",
+        "name": "Arenitas Blancas",
+        "descripcion": "Zona de Arenitas Blancas"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-57.9700, -31.4100],
+          [-57.9700, -31.4250],
+          [-57.9500, -31.4250],
+          [-57.9500, -31.4100],
+          [-57.9700, -31.4100]
+        ]]
+      }
+    }
+  ]
+}
