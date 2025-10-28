@@ -9,9 +9,9 @@ Define todas las estructuras de datos usando Pydantic para:
 """
 
 from datetime import datetime
-from typing import Optional, List, Dict, Literal, Any
+from typing import Optional, List, Dict, Literal, Any, Union
 from enum import Enum
-from pydantic import BaseModel, Field, validator, ConfigDict
+from pydantic import BaseModel, Field, validator, ConfigDict, model_validator
 
 
 # ============================================================================
@@ -910,8 +910,119 @@ class DistanceCalculationResponse(BaseModel):
 
 
 # ============================================================================
+# ZONIFICACIÓN DUAL DE MONTEVIDEO
+# ============================================================================
+
+class ZoneInfo(BaseModel):
+    """
+    Información detallada de una zona.
+    """
+    id: str = Field(..., description="ID de la zona")
+    codigo: Union[int, str, None] = Field(None, description="Código de la zona")
+    name: str = Field(..., description="Nombre de la zona")
+    properties: Dict[str, Any] = Field(
+        default_factory=dict,
+        description="Propiedades adicionales de la zona del GeoJSON"
+    )
+    geometry: Optional[Dict[str, Any]] = Field(
+        None,
+        description="Geometría GeoJSON de la zona"
+    )
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "id": "64",
+            "codigo": 64,
+            "name": "Zona 64",
+            "properties": {
+                "AREA": 11123482.046664737,
+                "PERIMETER": 16682.853975
+            }
+        }
+    })
+
+
+class DualZoneRequest(BaseModel):
+    """
+    Solicitud para detectar zonas de Montevideo (flete y global).
+    Soporta dirección completa o coordenadas.
+    """
+    address: Optional[Address] = Field(None, description="Dirección completa")
+    coordinates: Optional[Coordinates] = Field(None, description="Coordenadas (lat, lon)")
+    
+    @model_validator(mode='after')
+    def validate_input(self):
+        if not self.address and not self.coordinates:
+            raise ValueError("Debe proporcionar 'address' o 'coordinates'")
+        if self.address and self.coordinates:
+            raise ValueError("Debe proporcionar solo 'address' o 'coordinates', no ambos")
+        return self
+    
+    model_config = ConfigDict(json_schema_extra={
+        "examples": [
+            {
+                "address": {
+                    "street": "Av. 18 de Julio",
+                    "number": "1234",
+                    "city": "Montevideo",
+                    "country": "Uruguay"
+                }
+            },
+            {
+                "coordinates": {
+                    "lat": -34.9011,
+                    "lon": -56.1645
+                }
+            }
+        ]
+    })
+
+
+class DualZoneResponse(BaseModel):
+    """
+    Respuesta con zonificación dual de Montevideo.
+    """
+    coordinates: Coordinates = Field(..., description="Coordenadas del punto consultado")
+    zona_flete: Optional[ZoneInfo] = Field(
+        None,
+        description="Zona de flete/delivery (ZONAS_F) donde se encuentra el punto"
+    )
+    zona_global: Optional[ZoneInfo] = Field(
+        None,
+        description="Zona global/administrativa (ZONAS_4) donde se encuentra el punto"
+    )
+    address_provided: Optional[str] = Field(
+        None,
+        description="Dirección proporcionada (si se usó geocodificación)"
+    )
+    
+    model_config = ConfigDict(json_schema_extra={
+        "example": {
+            "coordinates": {
+                "lat": -34.9011,
+                "lon": -56.1645
+            },
+            "zona_flete": {
+                "id": "5",
+                "codigo": 5,
+                "name": "Zona Flete 5",
+                "properties": {"Codigo": 5}
+            },
+            "zona_global": {
+                "id": "64",
+                "codigo": 64,
+                "name": "Zona Global 64",
+                "properties": {"Codigo": 64, "AREA": 11123482.046664737}
+            },
+            "address_provided": "Av. 18 de Julio 1234, Montevideo, Uruguay"
+        }
+    })
+
+
+# ============================================================================
 # ACTUALIZACIÓN DE REFERENCIAS CIRCULARES
 # ============================================================================
 # Necesario para que Pydantic pueda resolver List['Order'] en Vehicle.current_orders
 Vehicle.model_rebuild()
+
 

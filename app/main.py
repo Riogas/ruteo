@@ -56,6 +56,9 @@ from app.models import (
     DistanceCalculationRequest,
     DistanceCalculationResponse,
     LocationInput,
+    DualZoneRequest,
+    DualZoneResponse,
+    ZoneInfo,
 )
 from app.geocoding import get_geocoding_service
 from app.utils import lat_lon_to_utm
@@ -1183,6 +1186,124 @@ async def calculate_distance(request: DistanceCalculationRequest) -> DistanceCal
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al calcular distancia/tiempo: {str(e)}"
+        )
+
+
+@app.post(
+    "/api/v1/zones-montevideo",
+    summary="🗺️ Detectar zonas de Montevideo (Flete + Global)",
+    response_description="Zonificación dual: zona de flete y zona global/administrativa",
+    response_model=DualZoneResponse,
+    tags=["zones"]
+)
+async def detect_montevideo_zones(request: DualZoneRequest) -> DualZoneResponse:
+    """
+    Determina en qué zonas de Montevideo se encuentra una dirección o coordenadas.
+    
+    **Zonificación Dual:**
+    - **Zona de Flete (ZONAS_F)**: Para cálculo de costos de delivery
+    - **Zona Global (ZONAS_4)**: Clasificación administrativa/geográfica
+    
+    **Opciones de entrada:**
+    1. Proporcionar dirección completa (se geocodificará automáticamente)
+    2. Proporcionar coordenadas lat/lon directamente
+    
+    ## Ejemplo 1: Usando dirección
+    
+    ```json
+    {
+        "address": {
+            "street": "Av. 18 de Julio",
+            "number": "1234",
+            "city": "Montevideo",
+            "country": "Uruguay"
+        }
+    }
+    ```
+    
+    ## Ejemplo 2: Usando coordenadas
+    
+    ```json
+    {
+        "coordinates": {
+            "lat": -34.9011,
+            "lon": -56.1645
+        }
+    }
+    ```
+    
+    ## Respuesta
+    
+    Retorna las coordenadas del punto y ambas zonas (si el punto está dentro de ellas):
+    
+    ```json
+    {
+        "coordinates": {
+            "lat": -34.9011,
+            "lon": -56.1645
+        },
+        "zona_flete": {
+            "id": "5",
+            "codigo": 5,
+            "name": "Zona Flete 5",
+            "properties": {...}
+        },
+        "zona_global": {
+            "id": "64",
+            "codigo": 64,
+            "name": "Zona Global 64",
+            "properties": {...}
+        },
+        "address_provided": "Av. 18 de Julio 1234, Montevideo, Uruguay"
+    }
+    ```
+    
+    Si el punto no está en alguna de las zonas, ese campo será `null`.
+    """
+    try:
+        # 1. Obtener coordenadas (geocodificar si es necesario)
+        address_str = None
+        
+        if request.address:
+            logger.info(f"🔍 Geocodificando dirección: {request.address}")
+            coords = geocoding_service.geocode(request.address)
+            address_str = f"{request.address.street} {request.address.number}, {request.address.city}, {request.address.country}"
+        else:
+            coords = request.coordinates
+            logger.info(f"📍 Usando coordenadas directas: {coords.lat}, {coords.lon}")
+        
+        # 2. Buscar en ambas zonificaciones
+        logger.info(f"🗺️  Buscando zonas para coordenadas ({coords.lat}, {coords.lon})")
+        zones_result = zones.find_zones_by_coordinates(coords.lat, coords.lon)
+        
+        # 3. Construir respuesta
+        response = DualZoneResponse(
+            coordinates=coords,
+            zona_flete=zones_result.get('flete'),
+            zona_global=zones_result.get('global'),
+            address_provided=address_str
+        )
+        
+        # Log del resultado
+        if response.zona_flete or response.zona_global:
+            log_parts = []
+            if response.zona_flete:
+                log_parts.append(f"Flete={response.zona_flete.codigo}")
+            if response.zona_global:
+                log_parts.append(f"Global={response.zona_global.codigo}")
+            logger.info(f"✅ Zonas detectadas: {', '.join(log_parts)}")
+        else:
+            logger.info(f"ℹ️  Punto no está en ninguna zona de Montevideo")
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"❌ Error detectando zonas de Montevideo: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al detectar zonas: {str(e)}"
         )
 
 
